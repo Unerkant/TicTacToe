@@ -1,0 +1,14 @@
+/**
+*   Den 9.06.2023
+*   CSS-Layout Paul Richter
+*/
+@charset "UTF-8";
+
+*, *::before, *::after  { box-sizing: border-box; padding: 0; margin: 0; }
+html, body              { width: 100%; height: 100%; }
+::-webkit-scrollbar     { display: none;}
+a:link                  { text-decoration: none; cursor: pointer; }
+.boxSizing              { box-sizing: border-box; }
+.finger                 { cursor: pointer; }
+.clear                  { clear: both;}
+img.blok			    { display: block; width: 100%; }

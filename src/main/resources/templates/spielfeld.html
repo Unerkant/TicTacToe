@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+
+  <title>Spielfeld</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="/img/tictac.png" rel="icon" sizes="32x32" type="image/png">
+  <style type="text/css"><!-- @import"/css/style.css"; --></style>
+  <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+</head>
+<body>
+<div align="center">
+
+  <h2 align="center">Willkommen bei Online Spiel Tic Tac Toe</h2>
+  <div><br><br></div>
+
+  <table border="1" width="450" cellspacing="0" cellpadding="0">
+    <tr>
+      <td class="feld" id="1" width="150" height="150" align="center">
+        <img id="1K" style="display: none;"  data-th-src="@{/img/kreuz.png}">
+        <img id="1R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="2" width="150" height="150" align="center">
+        <img id="2K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="2R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="3" width="150" height="150" align="center">
+        <img id="3K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="3R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+    </tr>
+    <tr>
+      <td class="feld" id="4" width="150" height="150" align="center">
+        <img id="4K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="4R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="5" width="150" height="150" align="center">
+        <img id="5K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="5R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="6" width="150" height="150" align="center">
+        <img id="6K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="6R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+    </tr>
+    <tr>
+      <td class="feld" id="7" width="150" height="150" align="center">
+        <img id="7K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="7R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="8" width="150" height="150" align="center">
+        <img id="8K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="8R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+      <td class="feld" id="9" width="150" height="150" align="center">
+        <img id="9K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+        <img id="9R" style="display: none;" data-th-src="@{/img/rund.png}">
+      </td>
+    </tr>
+  </table>
+</div>
+<script>
+  var kreuz = true;
+
+  $( ".feld" ).on( "click", function() {
+    var id = this.id;
+
+    if (istEinsDerBilderSichtbar(id)) {
+      // mache nichts
+      return;
+    }
+
+    // zeige Kreuz oder Kreis an
+    if (kreuz) {
+      $("#"+id+"K").show();
+      kreuz = false;
+    } else {
+      $("#"+id+"R").show();
+      kreuz = true;
+    }
+
+} );
+
+function istEinsDerBilderSichtbar(id) {
+  return $("#"+id+"K").is(":visible") || $("#"+id+"R").is(":visible");
+}
+
+</script>
+</body>
+</html>

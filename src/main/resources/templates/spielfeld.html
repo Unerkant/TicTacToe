@@ -11,10 +11,19 @@
   <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
 </head>
 <body>
-<div align="center">
 
-  <h2 align="center">Willkommen bei Online Spiel Tic Tac Toe</h2>
-  <div><br><br></div>
+<h2 align="center" class="homeHeader">Tic Tac Toe</h2>
+
+<div align="center">
+  <div class="">
+    <div>
+    <br><br>
+    </div>
+    <div>
+
+    </div>
+  </div>
+
 
   <table border="1" width="450" cellspacing="0" cellpadding="0">
     <tr>
@@ -61,7 +70,7 @@
     </tr>
   </table>
   <br>
-  <a th:href="@{/home}">Abbrechen</a>
+  <a class="spielFeldLink" th:href="@{/home}">Abbrechen</a>
 </div>
 <script>
   var kreuz = true;

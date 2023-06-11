@@ -1,11 +1,16 @@
 package com.tictactoc.TicTacToe.controller;
 
 import com.tictactoc.TicTacToe.model.Nachricht;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import java.util.UUID;
 
 /**
  * den 10.06.2023
@@ -19,8 +24,9 @@ public class NachrichtController {
 
 
     @GetMapping(value = "/nachricht")
-    public String nachricht(){
-
+    public String nachricht(Model model){
+        UUID uuid = UUID.randomUUID();
+        model.addAttribute("uuid", uuid.toString());
         return "/nachricht";
     }
 

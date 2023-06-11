@@ -3,15 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>TicTacToe</title>
+    <title>Home</title>
+    <link href="/img/tictac.png" rel="icon" sizes="32x32" type="image/png">
+    <style type="text/css"><!-- @import"/css/style.css"; --></style>
 </head>
 <body>
 
-    <h2 align="center">Willkommen bei Online Spiel Tic Tac Toe</h2>
+    <h2 align="center" class="homeHeader">Willkommen bei Online Spiele</h2>
     <br>
-    <div align="center">
-        <img data-th-src="@{/img/tictac.png}" width="30" height="30" >
-        <a th:href="@{/spielfeld}">Möchten sie Tic Toc Toe Spielen</a>
+    <div class="homeBox" >
+        <ul><li>
+            <a th:href="@{/spielfeld}">
+                <img data-th-src="@{/img/tictac.png}" width="30" height="30" >
+                 &#160;Jetzt Tic Toc Toe Spielen&#174;</a>
+        </ul></li>
     </div>
 </body>
 </html>

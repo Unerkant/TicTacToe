@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
 <head>
 
   <title>Spielfeld</title>
@@ -59,6 +60,8 @@
       </td>
     </tr>
   </table>
+  <br>
+  <a th:href="@{/home}">Abbrechen</a>
 </div>
 <script>
   var kreuz = true;

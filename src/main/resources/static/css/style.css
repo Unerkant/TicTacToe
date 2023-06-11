@@ -12,3 +12,8 @@ a:link                  { text-decoration: none; cursor: pointer; }
 .finger                 { cursor: pointer; }
 .clear                  { clear: both;}
 img.blok			    { display: block; width: 100%; }
+
+
+
+.container              { padding:10px; }
+.buton                  { padding: 10px; margin: 10px 0; text: 1.0em; }

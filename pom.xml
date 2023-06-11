@@ -8,30 +8,43 @@
 		<version>3.1.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.tictactoc</groupId>
+	<groupId>com.tictactoe</groupId>
 	<artifactId>TicTacToe</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>TicTacToe</name>
-	<description>Demo project for Spring Boot</description>
+	<description>TicTacToe project for Spring Boot</description>
 	<properties>
 		<java.version>20</java.version>
 	</properties>
+
 	<dependencies>
+
+		<!-- Spring Boot thymeleaf + Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 
+		<!-- Web-Socket -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>6.0.9</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>6.0.9</version>
+		</dependency>
+
 	</dependencies>
+
 
 	<build>
 		<plugins>

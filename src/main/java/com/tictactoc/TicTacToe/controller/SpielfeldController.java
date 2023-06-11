@@ -1,20 +1,18 @@
 package com.tictactoc.TicTacToe.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * den 9.6.2023
+ * den 11.06.2023
  */
 
 @Controller
-public class HomeController {
+public class SpielfeldController {
 
-    @GetMapping(value = {"/", "/home"})
-    public String home(){
+    @GetMapping(value = "/spielfeld")
+    public String spielfeld(){
 
-        return "/home";
+        return "/spielfeld";
     }
-
 }

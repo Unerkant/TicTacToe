@@ -1,0 +1,45 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nachricht</title>
+    <style type="text/css"><!-- @import"/css/style.css"; --></style>
+    <script type="text/javascript" th:src="@{/js/jquery.js}"></script>
+    <script type="text/javascript" th:src="@{/js/sockjs.js}"></script>
+    <script type="text/javascript" th:src="@{/js/stomp.js}"></script>
+
+</head>
+<body>
+
+<h2 align="center">Nachricht</h2>
+
+<div class="container">
+    <form>
+        <label id="verbunden" for="connect">Web Socket Connection:</label>
+        <br>
+        <button id="connect" class="buton" type="submit">Verbinden</button>
+        <br>
+        <button id="disconnect" class="buton" type="submit">Schliessen</button>
+    </form>
+    <br><br>
+    <form>
+        <label for="eingabe">Name:</label>
+        <br>
+        <input id="eingabe" class="buton" type="text" />
+        <br>
+        <button id="send" class="buton" type="submit">Send</button>
+    </form>
+
+    <br>
+    <br>
+    <hr>
+    <div>
+        <p id="ausgabe"></p>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/nachricht.js}"></script>
+
+</body>
+</html>

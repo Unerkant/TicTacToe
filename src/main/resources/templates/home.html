@@ -9,13 +9,26 @@
 </head>
 <body>
 
-    <h2 align="center" class="homeHeader">Willkommen bei Online Spiele</h2>
+    <div class="allHeader">
+        <h2 align="center">Willkommen bei Online Spiele</h2>
+    </div>
+
     <br>
+
     <div class="homeBox" >
         <ul><li>
-            <a th:href="@{/spielfeld}">
-                <img data-th-src="@{/img/tictac.png}" width="30" height="30" >
-                 &#160;Jetzt Tic Toc Toe Spielen&#174;</a>
+            <a th:href="@{/nachricht}">
+                <img class="nachrichtBild" >
+                &#160; eine Nachricht an alle schreiben
+            </a>
+        </ul></li>
+        <br>
+        <br>
+        <ul><li>
+            <a th:href="@{/tictactoe}">
+                <img id="homeBild" data-th-src="@{/img/tictac.png}" width="30" height="30" >
+                &#160; jetzt Tic Toc Toe Spielen<small style="color: red;">&#174;</small>
+            </a>
         </ul></li>
     </div>
 </body>

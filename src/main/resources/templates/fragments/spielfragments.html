@@ -1,0 +1,96 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Leer -->
+</head>
+<body>
+
+<!-- ****************** Fragment Spiel Feld ********************** -->
+
+    <div th:fragment="spielfeld">
+
+        <div class="flexBox spielWahl">
+            <!-- class 'zeichenwahl' nicht Löschen, benötigt für die javascript, spielfeld.js -->
+            <div id="KREUZWAHL" class="zeichenwahl flexBox spielZeichen">
+
+                <div class="zentriert">
+                    <img class="center" data-th-src="@{/img/kreuz.png}" width="20" height="20">
+                </div>
+                <div class="zentriert">
+                    <span id="kreuzSpieler">-</span>
+                </div>
+            </div>
+
+            <div id="RUNDWAHL" class="zeichenwahl flexBox spielZeichen">
+                <div class="zentriert">
+                    <img class="center" data-th-src="@{/img/rund.png}" width="20" height="20">
+                </div>
+                <div class="zentriert">
+                    <span id="kreisSpieler">-</span>
+                </div>
+            </div>
+
+        </div><!-- Ende SpielWahl -->
+
+        <div class="spielWahlText">
+            <div id="textInfo"></div>
+            <div id="spielInfo"></div>
+        </div>
+
+        <!-- class 'spielfeld' nicht Löschen, benötigt für die javascript, spielfeld.js -->
+        <table border="1" width="450" height="450" cellspacing="0" cellpadding="0">
+            <tr>
+                <td class="spielfeld" id="1" width="150" height="150" align="center">
+                    <img id="1K" style="display: none;"  data-th-src="@{/img/kreuz.png}">
+                    <img id="1R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="2" width="150" height="150" align="center">
+                    <img id="2K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="2R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="3" width="150" height="150" align="center">
+                    <img id="3K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="3R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+            </tr>
+            <tr>
+                <td class="spielfeld" id="4" width="150" height="150" align="center">
+                    <img id="4K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="4R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="5" width="150" height="150" align="center">
+                    <img id="5K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="5R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="6" width="150" height="150" align="center">
+                    <img id="6K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="6R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+            </tr>
+            <tr>
+                <td class="spielfeld" id="7" width="150" height="150" align="center">
+                    <img id="7K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="7R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="8" width="150" height="150" align="center">
+                    <img id="8K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="8R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+                <td class="spielfeld" id="9" width="150" height="150" align="center">
+                    <img id="9K" style="display: none;" data-th-src="@{/img/kreuz.png}">
+                    <img id="9R" style="display: none;" data-th-src="@{/img/rund.png}">
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <a class="spielNeues" href="#" th:onClick="'javascript:neuesSpiel();'">Neues Spiel</a>
+
+        <script type="text/javascript" th:src="@{/js/spielfeld.js}"></script>
+
+    </div><!-- Ende Fragment -->
+
+
+</body>
+</html>

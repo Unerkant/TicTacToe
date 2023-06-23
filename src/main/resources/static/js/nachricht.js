@@ -1,7 +1,14 @@
 // den 10.06.2023
 
+function nachrichtSenden(){
 
-var stompClient = null;
+    var textEingabe = $('#eingabe').val();
+    //$('#ausgabe').text(textEingabe);
+    senden(textEingabe);
+    //alert('senden: ' + textEingabe);
+}
+
+/*var stompClient = null;
 
 function connect(){
 
@@ -42,6 +49,6 @@ function willkommenNachricht(){
     $('verbunden').text('Verbindung zu Socket aufgebaut.')
     var nachrichtZumSenden = "Hallo ich bin online: " + $('#uuid').text();
     senden(nachrichtZumSenden);
-}
+}*/
 
 

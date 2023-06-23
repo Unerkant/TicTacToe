@@ -13,20 +13,43 @@
 </head>
 <body>
 
-<h2 align="center" class="homeHeader">Nachricht</h2>
+<!-- Header -->
 
-<div class="container">
+<div class="allHeader">
+
+    <table border="0" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="50" height="50" align="right" valign="center">
+                <a th:href="@{/home}" style="display: inline-block; width: 100%;">
+                    <div class="headerBild"></div>
+                </a>
+            </td>
+            <td align="center">
+
+                <h2>Nachricht</h2>
+
+            </td>
+            <td width="50" height="50" align="left" valign="center">
+                <div id="onlineNachricht" class="offlineBild"></div>
+            </td>
+        </tr>
+    </table>
+
+</div><!-- Ende Header -->
+
+<div class="nachrichtBox">
     <div>
         <p id="verbunden"></p>
     </div>
     <br><br>
-    <form class="form">
+    <form class="nachrichtForm" >
         <label for="eingabe">Name:</label>
         <br>
-        <input id="eingabe" class="button" type="text" />
+        <input id="eingabe" class="nachrichtButton" type="text" />
         <br>
-        <button id="send" class="button" type="submit">Send</button>
+
     </form>
+    <button id="send" class="nachrichtButton" onclick="nachrichtSenden()" type="submit">Send</button>
 
     <br>
     <br>
@@ -38,6 +61,7 @@
 </div>
 
 
+<script type="text/javascript" th:src="@{/js/mysocket.js}"></script>
 <script type="text/javascript" th:src="@{/js/nachricht.js}"></script>
 
 </body>

@@ -1,6 +1,6 @@
 package com.tictactoc.TicTacToe.controller;
 
-import com.tictactoc.TicTacToe.model.Spielereignisse;
+import com.tictactoc.TicTacToe.model.Spielstand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -37,12 +37,12 @@ public class TictactoeController {
     /**
      * Message Mapping
      *
-     * @param spielereignisse
+     * @param spielstand
      * @throws Exception
      */
-    @MessageMapping(value = "/spielereignisse")
-    public void messageReceiving(Spielereignisse spielereignisse) throws Exception{
-        simpMessagingTemplate.convertAndSend("/spielereignisse/empfangen/alle", spielereignisse);
+    @MessageMapping(value = "/spielstand")
+    public void spielstandReceiving(Spielstand spielstand) throws Exception{
+        simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstand);
     }
 
 

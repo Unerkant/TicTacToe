@@ -17,13 +17,19 @@ img.blok			    { display: block; width: 100%; }
 .blau                   { color: #2B8CC4;}
 .rot                    { color: #F70000; }
 
+.itemMiddle             {   display: flex; flex-direction: row; align-items: center; }
+
     /* Header */
 .flexBox                {display: -webkit-flex; display: -ms-flexbox; display: flex;}
 .allHeader              { background-color: #FAFAFF; border-bottom: 1px solid #E6E6FF; padding: 20px 0 10px; }
 .headerBild             { background-image: url("/img/home.png"); background-size: cover; width: 24px; height:24px;}
 .headerBild:hover       { background-image: url("/img/home.gif"); background-repeat: no-repeat;}
-.onlineBild             { background-image: url("/img/online.png"); background-size: cover; width: 30px; height:30px;}
-.offlineBild            { background-image: url("/img/offline.png"); background-size: cover; width: 30px; height:30px;}
+.onlineBild             { background-image: url("/img/online.png"); background-size: cover; width: 30px; height:30px;
+                          background-repeat: no-repeat; }
+.offlineBild            { background-image: url("/img/offline.png"); background-size: cover; width: 30px; height:30px;
+                          background-repeat: no-repeat; }
+.onlineFehler           { background-image: url("/img/onlinered.png"); background-size: cover; width: 30px; height:30px;
+                          background-repeat: no-repeat; }
 
     /* Home
      ---------*/
@@ -31,8 +37,10 @@ img.blok			    { display: block; width: 100%; }
 .homeBox ul li          { list-style-position: inside; }
 .homeBox img            { vertical-align: middle; }
 .homeBox a              { font-size: 1.1em; color: black; }
-.nachrichtBild          { background-image: url("/img/nachricht.png"); background-size: cover; width: 30px; height:30px; }
-.nachrichtBild:hover    { background-image: url("/img/nachricht.gif"); background-repeat: no-repeat;}
+.nachrichtBild          { background-image: url("/img/nachricht.png"); background-size: cover; width: 30px; height:30px;
+                          background-repeat: no-repeat; background-repeat: no-repeat; }
+.nachrichtBild:hover    { background-image: url("/img/nachricht.gif"); background-size: cover; width: 30px; height: 30px;
+                          background-repeat: no-repeat; background-repeat: no-repeat; }
 
 
     /* spielfragments
@@ -43,12 +51,13 @@ img.blok			    { display: block; width: 100%; }
                           border: 1px solid #E6E6FF; border-radius: 6px;
                         }
 .wahlHover              { border-bottom: 2px solid #1608D3; }
-.spielWahlText          { height: 30px; }
+.spielWahlText          { /* height: 30px; */ }
 .spielNeues             { font-size: 1.2rem; color: #1608D3; }
 
 
     /* nachricht
     -------------*/
 .nachrichtBox           { padding:10px; }
-.nachrichtForm          { }
+.nachrichtOutput        { padding: 0 20px; }
+.nachrichtForm          { padding: 0; margin: 0;}
 .nachrichtButton        { padding: 10px; margin: 10px 0; text-size: 1.0em; }

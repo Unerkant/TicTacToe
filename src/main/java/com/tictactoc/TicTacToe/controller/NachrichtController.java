@@ -30,7 +30,7 @@ public class NachrichtController {
 
 
     @MessageMapping(value = "/nachrichten")
-    public void messageReceiving(Nachricht nachricht) throws Exception{
+    public void nachrichtenReceiving(Nachricht nachricht) throws Exception{
         simpMessagingTemplate.convertAndSend("/nachrichten/empfangen/alle", nachricht);
     }
 }

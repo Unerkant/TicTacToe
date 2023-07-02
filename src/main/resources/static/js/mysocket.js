@@ -1,11 +1,13 @@
 // den 10.06.2023
 
 
+/*
+ *  Socket
+ */
 var stompClient = null;
-
 function connect(){
 
-    $('#eingabe').focus();
+    $('#nachrichtText').focus();
 
     //alert("connect");
     var socket = new SockJS('/registrieren');
@@ -13,59 +15,149 @@ function connect(){
     stompClient.connect({}, function(frame){
         //$('#verbunden').text('Verbunden').css("color","green");
 
+        /*
+        *   Eingehende Nachricht, ausgabe in nachricht.html
+        */
         stompClient.subscribe("/nachrichten/empfangen/alle", function(message){
             var message = JSON.parse(message.body);
 
-            $('#ausgabe').text('Ausgabe: ' + message.text);
+            var valueHtml = "<ul><li><p>" + message.text + "</p></li></ul>";
+            $('#nachrichtAusgabe').html($('#nachrichtAusgabe').html()+valueHtml);
+            //$('.messageBody').scrollTop($('.messageBody')[0].scrollHeight);
 
         });
 
-        stompClient.subscribe("/spielereignisse/empfangen/alle", function(spielereignisse){
-            var spielzug = JSON.parse(spielereignisse.body);
 
-            // Spiel kreuz oder kreis ins spielFeld setzen, spielfeld.js Zeile: 100
-            spielFeldSetzen(spielzug.spielFeld, spielzug.spielStein);
+       /*
+        *   Eingehende Daten von den Spiel, eine ID von Spiel Feld + kreuz oder kreis
+        */
+        stompClient.subscribe("/spielstand/empfangen/alle", function(spielzug){
 
-            $('#spielInfo').text(spielzug.spielFeld + "/" + spielzug.spielStein);
-        })
+            try{
+                var spielZug = JSON.parse(spielzug.body);
+                //$('#spielInfo').text('JSON.parse: ' + spielZug.spielFeld + "/" + spielZug.spielStein +"/"+ spielZug.spielActiv);
 
-        willkommenNachricht();
+            } catch(e) {
+                $('#empfangFehler').html("JSON.parse Fehler:  <span class='rot'>" + e.message + "</span>");
+            }
 
-    }, function(fehler) {
-        fehlerNachricht(fehler);
-        //$('#ausgabe').html("Es konnte keine Verbindung aufgebaut werden!<br>Fehlernachricht: " + fehler).css("color","red");
+            /*
+             * Spiel kreuz oder kreis ins spielFeld setzen,
+             * weiter senden an spielfeld.js Zeile: 146
+             */
+            spielFeldSetzen(spielZug);
+
+        });
+
+
+        /*
+        *   empfangen von Nachricht von Spielverlauf oder spielfehler
+        *   1. SpielFeld ist besetzt: spielfeld.js Zeile: 113
+        */
+        stompClient.subscribe("/spielnachricht/empfangen/alle", (spielnachricht) => {
+            var spielNachricht = JSON.parse(spielnachricht.body);
+
+            //$('#spielInfo').text(spielNachricht);
+            infoAnzeige(spielNachricht.ok, spielNachricht.infotext);
+        });
+
+
+        /*
+        *   Neues Spiel Starten
+        */
+        stompClient.subscribe("/neuspielstarten/empfangen/alle", (neuspielstarten) => {
+            var neuesSpielStarten = JSON.parse(neuspielstarten.body);
+
+            // spielfeld.js Zeile: 238
+            spielNeuStarten(neuesSpielStarten);
+        });
+
+
+
+        // socket verbindung aufgebaut, in Header/Rechts grünes Sender-Bild
+        connected();
+
+    }, function(err) {
+        // reagiert nur auf defekten 'new SockJS('/registrieren')'... defekt: new SockJS('/reg');
+        disconnected(err);
     });
 }
 
-function senden(textsenden){
-    stompClient.send("/app/nachrichten", {}, JSON.stringify({'text': textsenden}));
-}
-
-function spielStandSenden(spielFeld, spielStein){
-
-    stompClient.send("/app/spielereignisse", {}, JSON.stringify({'spielFeld': spielFeld, 'spielStein': spielStein }));
-
-}
-
-
-
-
+/*
+ * Socket Connect
+ */
 $(function(){
     connect();
 });
 
-function willkommenNachricht(){
 
-    $('#online').removeClass("offlineBild").addClass("onlineBild");
-    $('#onlineNachricht').removeClass("offlineBild").addClass("onlineBild");
+/*
+ * Nachrichten Senden, nachricht.html Zeile: 48(onClick)
+ */
+function nachrichtSenden(value){
 
-   /* $('#verbunden').text('Verbindung zu Socket aufgebaut.')
-    var nachrichtZumSenden = "Hallo ich bin online: " + $('#uuid').text();
-    senden(nachrichtZumSenden);*/
+    // wenn Text Feld Leer ist, nichts machen
+    if(!value){
+        $('#nachrichtText').focus();
+        return;
+    }
+    // Nachricht Versenden
+    stompClient.send("/app/nachrichten", {}, JSON.stringify({'text': value}));
+
+     // Text Input Leeren + Focus setzen
+     $('#nachrichtText').val("");
+     $('#nachrichtText').focus();
 }
 
-function fehlerNachricht(fehler){
 
-    $('#online').removeClass("onlineBild").addClass("offlineBild");
-    $('#meineUUID').html("<span class='rot'>" + fehler + "</span>")
+/*
+ * Spiel Stand Senden, start spielfeld.js Zeile: 112 + 119
+ */
+function spielStandSenden(spielStand){
+
+    // Spiel ereignisse weiter an Spiel Feld Senden, empfangen: zeile: 30(hier oben)
+    stompClient.send("/app/spielstand", {}, JSON.stringify(spielStand));
+
+}
+
+
+/*
+*   Spielverlauf oder spielfehler an alle senden
+*/
+function spielNachrichtSenden(texting){
+
+    stompClient.send("/app/spielnachricht", {}, JSON.stringify(texting));
+
+}
+
+
+/*
+*   Neues Spiel Beginnen
+*/
+function neuesSpielSenden(neueSpiel){
+
+    stompClient.send("/app/neuspielstarten", {}, JSON.stringify(neueSpiel));
+}
+
+/*
+ * connect anzeige, start(hier) Zeile: 34
+ */
+function connected(){
+
+    $('#online').removeClass("offlineBild");
+    $('#online').addClass("onlineBild");                //tictactoe.html
+    $('#onlineNachricht').removeClass("offlineBild");
+    $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
+
+}
+
+/*
+ *  Allgemeine Fehler Anzeige
+ *  ID: #meineUUID + #online, sind in tictactoe.html Zeile: 31 + 35
+ */
+function disconnected(fehler){
+
+    $('#online').removeClass("onlineBild");
+    $('#online').addClass("onlineFehler");
+    $('#meineUUID').html("<span class='rot'>" + fehler + "</span>");
 }

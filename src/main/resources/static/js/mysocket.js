@@ -139,6 +139,8 @@ function neuesSpielSenden(neueSpiel){
     stompClient.send("/app/neuspielstarten", {}, JSON.stringify(neueSpiel));
 }
 
+
+
 /*
  * connect anzeige, start(hier) Zeile: 34
  */
@@ -150,6 +152,7 @@ function connected(){
     $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
 
 }
+
 
 /*
  *  Allgemeine Fehler Anzeige

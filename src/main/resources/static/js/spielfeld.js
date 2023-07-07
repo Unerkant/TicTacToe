@@ -10,6 +10,7 @@
     var spielAktiv = false;
     // Kreuz oder Kreis Click
     var kreuz = true;
+    // gewellte Stein,
     var aktivStein = "";
 
     // Information Ausgabe
@@ -94,7 +95,7 @@
     /*
      *  kreuz oder kreis in den Spiel Feld setzen, mysocket.js Zeile: 67
      */
-    var feldId = null;
+    var bildId = null;
     var newObj = null;
 
     $( ".spielfeld" ).on( "click", function() {
@@ -129,15 +130,15 @@
         spielAktiv = true;
 
         if (kreuz) {
-            feldId = "#"+id+"K";
-            newObj = {"spielFeld" : feldId, "spielStein" : "kreuz", "spielActiv" : true, "aktiveStein" : aktivStein};
+            bildId = "#"+id+"K";
+            newObj = {"feldId" : id, "bildId" : bildId, "spielStein" : "kreuz", "spielActiv" : true, "aktiveStein" : aktivStein};
 
             // von angeklickte Feld, Daten weiten senden... mysocket.js Zeile: 104
             spielStandSenden(newObj);
 
         } else {
-            feldId = "#"+id+"R";
-            newObj = {"spielFeld" : feldId, "spielStein" : "kreis", "spielActiv" : true, "aktiveStein" : aktivStein};
+            bildId = "#"+id+"R";
+            newObj = {"feldId" : id, "bildId" : bildId, "spielStein" : "kreis", "spielActiv" : true, "aktiveStein" : aktivStein};
 
             // von angeklickte Feld, Daten weiten senden... mysocket.js Zeile: 104
             spielStandSenden(newObj);
@@ -157,7 +158,7 @@
 
     /*
      *  SpielStein(kreuz oder kreis) in richtigen Feld setzen,
-     *  Daten zugesendet von mysocket.js Zeile: 44
+     *  Daten zugesendet von mysocket.js Zeile: 48
      *
      *  ACHTUNG: Original Daten kommen von hier oben, die function
      *   $( ".spielfeld" ).on( "click", function(){...}
@@ -168,17 +169,26 @@
      var kreuzZahl  = 0;
      var kreisZahl  = 0;
      var activesStein = "";
+
     function spielFeldSetzen(feldData){
 
-        //nur gesetzete kreuz oder kreis hoch zählen
+        // Prüfen ob Spiel Feld Besetzt ist
+        var feldIds = feldData.feldId;
+        if(istEinsDerBilderSichtbar(feldIds)){
+            $('#textInfo').text('das Feld ' + feldIds+ ' ist besetzt: ');
+            return
+        }
+
+
+        //nur gesetzte kreuz oder kreis hoch zählen
         feldData.spielStein == "kreuz" ? kreuzZahl ++ : kreisZahl ++;
         $("#kreuzSpieler").text(kreuzZahl);
         $("#kreisSpieler").text(kreisZahl);
 
         // Auswahl der Steines wird gesperrt
-        spielAktiv = feldData.spielActiv;
+        spielAktiv = feldData.spielActiv; // true
 
-        // getroffenen Wahl-Stein an alle anzeigen
+        // gewellte Wahl-Stein an alle anzeigen
         activesStein     = feldData.aktiveStein;
         activesStein == "kreuz" ? kreuzGewellt() : kreisGewellt();
 
@@ -187,19 +197,21 @@
         var welchesStein    = null;
         var welchesFeld     = null;
 
+        console.log('Push: ' + feldArray);
+
         // zeige Kreuz oder Kreis an
         for(var x in feldArray){
 
             welchesStein    = feldArray[x].spielStein;
-            welchesFeld     = feldArray[x].spielFeld;
+            welchesBild     = feldArray[x].bildId;
             if(welchesStein == "kreuz"){
 
-                $(welchesFeld).show();
+                $(welchesBild).show();
                 kreuz = false;
 
             } else if(welchesStein == "kreis"){
 
-                $(welchesFeld).show();
+                $(welchesBild).show();
                 kreuz = true;
 
             }
@@ -209,8 +221,11 @@
     }
 
 
+
     /*
      *  Neues Spiel Starten, spielfragments.html Zeile: 88(a, onClick)
+     *  ACHTUNG: die variable: 'nueSpiel' zurzeit werde nicht benutzt,
+     *
      */
     function neuesSpiel(){
 
@@ -219,9 +234,8 @@
         neuesSpielSenden(neuArr);
 
     }
-
     /*
-    *  Spiel am Allen Browser Neu Starten, mysocket.js Zeile: 72
+    *   Spiel am Allen Browser Neu Starten, mysocket.js Zeile: 72
     */
     function spielNeuStarten(data){
         var dataFalse = data.neuspiel;

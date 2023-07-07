@@ -6,13 +6,17 @@ package com.tictactoc.TicTacToe.model;
 
 public class Spielstand {
 
-    private String spielFeld;
+    private String feldId;
+    private String bildId;
     private String spielStein;
     private Boolean spielActiv;
     private String aktiveStein;
 
-    public String getSpielFeld() { return spielFeld; }
-    public void setSpielFeld(String spielFeld) { this.spielFeld = spielFeld; }
+    public String getFeldId() { return feldId; }
+    public void setFeldId(String feldId) { this.feldId = feldId; }
+
+    public String getBildId() { return bildId;}
+    public void setBildId(String bildId) { this.bildId = bildId; }
 
     public String getSpielStein() { return spielStein; }
     public void setSpielStein(String spielStein) { this.spielStein = spielStein; }

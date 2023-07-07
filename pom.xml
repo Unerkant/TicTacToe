@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tictactoe</groupId>
 	<artifactId>TicTacToe</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.8</version>
 	<name>TicTacToe</name>
 	<description>TicTacToe project for Spring Boot</description>
 	<properties>

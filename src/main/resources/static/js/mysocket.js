@@ -4,6 +4,7 @@
 /*
  *  Socket
  */
+var spielZugArray = [];
 var stompClient = null;
 function connect(){
 
@@ -34,17 +35,21 @@ function connect(){
         stompClient.subscribe("/spielstand/empfangen/alle", function(spielzug){
 
             try{
+
                 var spielZug = JSON.parse(spielzug.body);
-                //$('#spielInfo').text('JSON.parse: ' + spielZug.spielFeld + "/" + spielZug.spielStein +"/"+ spielZug.spielActiv);
 
             } catch(e) {
+
                 $('#empfangFehler').html("JSON.parse Fehler:  <span class='rot'>" + e.message + "</span>");
             }
 
             /*
              * Spiel kreuz oder kreis ins spielFeld setzen,
              * weiter senden an spielfeld.js Zeile: 146
+             * weitergeleitetn array sieht so aus:
+             *  [null,null,null,"kreuz","kreis","kreuz",null,null,"kreis"]
              */
+
             spielFeldSetzen(spielZug);
 
         });
@@ -61,19 +66,6 @@ function connect(){
             infoAnzeige(spielNachricht.ok, spielNachricht.infotext);
         });
 
-
-        /*
-        *   Neues Spiel Starten
-        */
-        stompClient.subscribe("/neuspielstarten/empfangen/alle", (neuspielstarten) => {
-            var neuesSpielStarten = JSON.parse(neuspielstarten.body);
-
-            // spielfeld.js Zeile: 238
-            spielNeuStarten(neuesSpielStarten);
-        });
-
-
-
         // socket verbindung aufgebaut, in Header/Rechts grünes Sender-Bild
         connected();
 
@@ -89,6 +81,7 @@ function connect(){
 $(function(){
     connect();
 });
+
 
 
 /*
@@ -122,8 +115,8 @@ function spielStandSenden(spielStand){
 
 
 /*
-*   Spielverlauf oder spielfehler an alle senden
-*/
+ *   Spielverlauf oder spielfehler an alle senden
+ */
 function spielNachrichtSenden(texting){
 
     stompClient.send("/app/spielnachricht", {}, JSON.stringify(texting));
@@ -132,11 +125,27 @@ function spielNachrichtSenden(texting){
 
 
 /*
-*   Neues Spiel Beginnen
-*/
-function neuesSpielSenden(neueSpiel){
+ * ein abruf des laufendes Spiel, in neuen Browser wird den Aktuellen spielStand angezeigt
+ * Da hier kein Body verlangt wird, wir keine ausgabe deklariert(stompClient.subscribe("/spielstand/abfrage.....)
+ *
+ *  ACHTUNG: der SpielStand des aktuelles Spiel wir automatisch bei neuem socket verbindung geprüft.
+ *  Zeile: 167, function connected()...
+ */
+function spielStandAbfrage(){
 
-    stompClient.send("/app/neuspielstarten", {}, JSON.stringify(neueSpiel));
+    stompClient.send("/app/spielstand/abfrage", {});
+}
+
+
+
+/*
+ *   Neues Spiel Beginnen
+ *  Start: spielfeld.js Zeile: 195
+ */
+function neuesSpielSenden(){
+
+    stompClient.send("/app/neuspielstarten", {}, "");
+
 }
 
 
@@ -151,6 +160,7 @@ function connected(){
     $('#onlineNachricht').removeClass("offlineBild");
     $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
 
+    spielStandAbfrage();
 }
 
 

@@ -28,7 +28,8 @@
       <td align="center">
 
         <h2>Tic Tac Toe</h2>
-        <small id="meineUUID" class="blau" th:Text="${uuid}"></small>
+        <!--<small id="meineUUID" class="blau" th:Text="${uuid}"></small>-->
+        <span>Verbundene Clients: </span><small id="clientsIdsAnzeige" class="blau"></small>
 
       </td>
       <td width="50" height="50" align="left" valign="center">
@@ -46,6 +47,8 @@
 <div align="center" style="min-width: 500px;"> <!-- Haupt Body div -->
 
   <div id="SPIELFELD" th:insert="~{/fragments/spielfragments :: spielfeld}" style="width: 500px;"></div>
+
+  <div id="clientSession"></div>
 
 </div><!-- Ende Haupt Body div -->
 

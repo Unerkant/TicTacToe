@@ -33,14 +33,10 @@
             if(ids == 'KREUZWAHL'){
 
                 kreuzGewellt();
-                // kurze info,
-                spielSteinWellen("Sie haben Kreuz gewellt");
 
             } else {
 
                 kreisGewellt();
-                // kurze info
-                spielSteinWellen("Sie Haben Kreis gewellt");
 
             }
 
@@ -67,6 +63,9 @@
           kreuz = true;
           mouseAktiv = false;
           kreuzOderKreis = true;
+
+          // kurze info,
+          spielSteinWellen("Sie haben Kreuz gewellt");
     }
     function kreisGewellt(){
          $('#RUNDWAHL').addClass( "wahlHover" );
@@ -74,11 +73,14 @@
          kreuz = false;
          mouseAktiv = false;
          kreuzOderKreis = true;
+
+         // kurze info
+         spielSteinWellen("Sie Haben Kreis gewellt");
     }
 
 
     /*
-     * nur Information Anzeige
+     * nur Information Anzeige, von Zeile: 68 + 78
      * Spielstein wellen und Nachricht anzeigen, start(hier) Zeile: 38 & 46
      */
     function spielSteinWellen(gewelltestein){
@@ -91,34 +93,31 @@
 
 
     /*
-     *  kreuz oder kreis in den Spiel Feld setzen, mysocket.js Zeile: 67
+     *  kreuz oder kreis in den Spiel Feld setzen, mysocket.js Zeile: 53
      */
     var newObj = null;
-
     $( ".spielfeld" ).on( "click", function() {
 
         var id = this.id;
         if (istEinsDerBilderSichtbar(id) || kreuzOderKreis == false) {
             if(kreuzOderKreis == false){
 
+                // nur Nachricht anzeigen, noch kein Spiel Stein gewellt
                 infoText = "treffen sie ihre Wahl, kreuz oder kreis"
                 infoOk = false;
-                //infoAnzeige(infoOk, infoText);
-
                 var ihreWahl = {"infook" : infoOk, "infotext" : infoText};
                 spielNachrichtSenden(ihreWahl);
 
             } else {
 
+                // einen click auf der Besetzten Feld, nachricht an allen anzeigen
                 infoText = "bereits getätigt"
                 infoOk = false;
-                //infoAnzeige(infoOk, infoText);
-
-                // einen click auf der Besetzten Feld, nachricht an allen anzeigen
                 var feldBesetzt = {"infook" : infoOk, "infotext" : infoText};
                 spielNachrichtSenden(feldBesetzt);
 
             }
+
             // mache nichts, wenn spielfeld schon gesetzt ist
             return;
         }
@@ -129,13 +128,13 @@
         if (kreuz) {
 
             newObj = {"feldId" : id, "spielStein" : "kreuz"};
-            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 104
+            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 121
             spielStandSenden(newObj);
 
         } else {
 
             newObj = {"feldId" : id, "spielStein" : "kreis"};
-            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 104
+            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 121
             spielStandSenden(newObj);
 
         }
@@ -154,14 +153,12 @@
     /*
      *  Spiel Stein(kreuz oder kreis) in richtigen Feld setzen,
      *  Beschreibung: die zugesendeten array hatte immer 9 size,
-     *  Daten zugesendet von mysocket.js Zeile: 52
-     *
-     *
+     *  Daten zugesendet von mysocket.js Zeile: 53
      *
      *  ACHTUNG: Original Daten kommen von hier oben, die function
      *   $( ".spielfeld" ).on( "click", function(){...}
-     *   Zeile: 129 & 135 (hier oben), den array sieht so aus:
-     *   [null,null,null,"kreuz","kreis","kreuz",null,null,"kreis"]
+     *   Zeile: 132 & 138 (hier oben), den array sieht so aus:
+     *   {"feldId" : id, "spielStein" : "kreis"}
      */
     function spielFeldSetzen(feldData){
 
@@ -189,6 +186,7 @@
 
     /*
      *  Neues Spiel Starten,
+     *
      *  Start: spielfragments.html Zeile: 88(a, onClick)
      *  Weitersenden: mysocket.js Zeile: 157
      */
@@ -204,6 +202,42 @@
     }
 
 
+   /*
+    *   Neues Spiel Starten
+    *
+    *   Start: mysocket.js Zeile: 77, 'stompClient.subscribe("/neuspielstarten/empfangen/alle"...'
+    *   Aller variable in spielfeld.js auf start einstellung setzen
+    */
+    function spielVariableReset(){
+
+        $('#RUNDWAHL').removeClass( "wahlHover" );
+        $('#KREUZWAHL').removeClass( "wahlHover" );
+
+        // mouse effect anzeigen/aussetzen
+        mouseAktiv = true;
+        // treffen sie ihre wahl, kreuz oder kreis
+        kreuzOderKreis = false;
+        // wenn Spiel beginnt
+        spielAktiv = false;
+        // Kreuz oder Kreis Click
+        kreuz = true;
+
+        // Information Ausgabe
+        infoText = "";
+        infoOk = true;
+
+    }
+
+
+    /*
+     *  zugesendet von masocket.js Zeile: 78
+     */
+    function clientSessionAnzeigen(session){
+
+        //alert("Session" + session.clientId);
+        $("#clientsIdsAnzeige").text( session.clientsSessions );
+    }
+
     /*
      *  Informationen Anzeigen,
      *  Zeile: (hier) 77, 81, 114, 150
@@ -211,8 +245,8 @@
      */
     function infoAnzeige(ok, text){
 
-        ok == true ? $("#textInfo").css("color","black") : $("#textInfo").css("color","red");
-        $("#textInfo").html("<p>"+text+"<p>");
-        $("#textInfo p").delay(2000).fadeOut(600);
+        ok == "true" ? $("#spielInfo").css("color","black") : $("#spielInfo").css("color","red");
+        $("#spielInfo").html("<p>"+text+"<p>");
+        $("#spielInfo p").delay(2000).fadeOut(600);
         //setTimeout(function() {sleep(loschen)}, 2000);
     }

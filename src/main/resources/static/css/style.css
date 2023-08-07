@@ -14,7 +14,8 @@ a:link                  { text-decoration: none; cursor: pointer; }
 img.blok			    { display: block; width: 100%; }
 .zentriert              { display: flex; align-items: center; }
 .grun                   { color: #00F700; }
-.blau                   { color: #2B8CC4;}
+.dunkelgrun             { color: #00CC00; }
+.blau                   { color: #2B8CC4; }
 .rot                    { color: #F70000; }
 
 .itemMiddle             {   display: flex; flex-direction: row; align-items: center; }
@@ -51,7 +52,7 @@ img.blok			    { display: block; width: 100%; }
                           border: 1px solid #E6E6FF; border-radius: 6px;
                         }
 .wahlHover              { border-bottom: 2px solid #1608D3; }
-.spielWahlText          { /* height: 30px; */ }
+.spielWahlText          { height: 30px; }
 .spielNeues             { font-size: 1.2rem; color: #1608D3; }
 
 

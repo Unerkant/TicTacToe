@@ -6,15 +6,26 @@
  */
 var spielZugArray = [];
 var stompClient = null;
+var sessionID   = null;
 function connect(){
 
-    $('#nachrichtText').focus();
+    //$('#nachrichtText').focus();
+    // Textarea Leeren Zeile: 225 (hier unten)
+    textareaLeeren();
 
     //alert("connect");
     var socket = new SockJS('/registrieren');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame){
-        //$('#verbunden').text('Verbunden').css("color","green");
+
+        // client sessionID aus den URL holen
+        var registerPfad = this.ws._transport.url;
+        var pfadElemente = registerPfad.split("/");
+        sessionID    = pfadElemente[pfadElemente.length - 2];
+        // tictactoe.html: client session ID in header anzeigen...
+        $("#clientsIdsAnzeige").text( sessionID );
+        // nachricht.html: client session ID in Header anzeigen
+        $("#userSession").text(sessionID);
 
         /*
         *   Eingehende Nachricht, ausgabe in nachricht.html
@@ -22,9 +33,23 @@ function connect(){
         stompClient.subscribe("/nachrichten/empfangen/alle", function(message){
             var message = JSON.parse(message.body);
 
-            var valueHtml = "<ul><li><p>" + message.text + "</p></li></ul>";
+            var valueHtml = "<ul><li>"+
+                                "<p><span class='rot'>[" + message.usersession + "] </span>" +
+                                "<span>" + message.text + "</span>"  +
+                              "</p></li></ul>";
             $('#nachrichtAusgabe').html($('#nachrichtAusgabe').html()+valueHtml);
             //$('.messageBody').scrollTop($('.messageBody')[0].scrollHeight);
+
+        });
+
+
+        /*
+         *  Client Session Id an Alle anzeigen, wer Online ist
+         */
+        stompClient.subscribe("/clientsession/empfangen/alle", (sessionenId) => {
+            var clientSessionId = JSON.parse(sessionenId.body);
+
+            // AUSGESETZT: wird Direkt nur für Aktuelle Client in Header angezeigt, Zeile:24 (hier oben)
 
         });
 
@@ -59,23 +84,11 @@ function connect(){
         *   empfangen von Nachricht von Spielverlauf oder spielfehler
         *   1. SpielFeld ist besetzt: spielfeld.js Zeile: 113
         */
-        stompClient.subscribe("/spielnachricht/empfangen/alle", (spielnachricht) => {
+        stompClient.subscribe("/spielnachricht/empfangen/" + sessionID, (spielnachricht) => {
             var spielNachricht = JSON.parse(spielnachricht.body);
 
-            //$('#spielInfo').text("Spiel Nachricht: " + spielNachricht.infook);
+            //$('#spielInfo').text("Spiel Nachricht: " + spielNachricht.infotext);
             infoAnzeige(spielNachricht.infook, spielNachricht.infotext);
-        });
-
-
-        /*
-         *  Client Session Id an Alle anzeigen, wer Online ist
-         */
-        stompClient.subscribe("/clientsession/empfangen/alle", (sessionenId) => {
-            var clientSessionId = JSON.parse(sessionenId.body);
-
-            // client Session Id in spielfeld.js Zeile: 235 anzeigen...
-            clientSessionAnzeigen(clientSessionId);
-            //$('#spielInfo').text( "clientSessionId" + clientSessionId );
         });
 
 
@@ -87,6 +100,9 @@ function connect(){
 
             spielFeldSetzen(spielReseten);
             spielVariableReset();
+            var okInfo = true;
+            var textInfo = "Ein neues Spiel beginnt!";
+            infoAnzeige(okInfo, textInfo);
             //$('#spielInfo').text("Neues Spiel Beginnen" + spielReseten);
         });
 
@@ -108,10 +124,18 @@ $(function(){
     connect();
 });
 
-    /* ****************** Sende Methoden ******************* */
+
+
+    /* ***************************** Sende Methoden ********************************** */
+
+
 
 /*
- * Nachrichten Senden, nachricht.html Zeile: 48(onClick)
+ * Nachrichten Senden, onClick in nachricht.html Zeile: 50
+ *
+ * Zusätzlich zum Text fügen wir noch eine User Session dazu...
+ *  weiter gesendet an NachrichtController(@MessageMapping(value = "/nachrichten"))
+ *  dann an den socket/stompClient (hier oben Zeile: 31)
  */
 function nachrichtSenden(value){
 
@@ -120,12 +144,15 @@ function nachrichtSenden(value){
         $('#nachrichtText').focus();
         return;
     }
-    // Nachricht Versenden
-    stompClient.send("/app/nachrichten", {}, JSON.stringify({'text': value}));
 
-     // Text Input Leeren + Focus setzen
-     $('#nachrichtText').val("");
-     $('#nachrichtText').focus();
+
+    var nachrichtZumSenden = {"text" : value, "usersession" : sessionID};
+    // Nachricht mit User Session Versenden
+    stompClient.send("/app/nachrichten", {}, JSON.stringify(nachrichtZumSenden));
+
+    // Textarea Leeren Zeile: 225 (hier unten)
+    textareaLeeren();
+
 }
 
 
@@ -133,12 +160,25 @@ function nachrichtSenden(value){
  *  Client session Id abfragen, anzeigen und bei schliessen entfernen
  *  Automatische Start bei socket connected, Zeile: 208(hier unten)
  *
- *  Weitergeleitet an TictactoeController Zeile: 114,
+ *  Weitergeleitet an TictactoeController Zeile: 154,
  *  @MessageMapping(value = "/clientSession")
  */
 function clientSessionAbfragen(){
 
-    stompClient.send("/app/clientSession", {});
+    stompClient.send("/app/clientSession", {}); // ACHTUNG AUSGESETZT
+}
+
+
+/*
+ * ein abruf des laufendes Spiel, in neuen Browser wird den Aktuellen spielStand angezeigt
+ * Da hier kein Body verlangt wird, wir keine ausgabe deklariert(stompClient.subscribe("/spielstand/abfrage.....)
+ *
+ *  ACHTUNG: der SpielStand des aktuelles Spiel wir automatisch bei neuem socket verbindung geprüft.
+ *  Zeile: 167, function connected()...
+ */
+function spielStandAbfrage(){
+
+    stompClient.send("/app/spielstand/abfrage", {});
 }
 
 
@@ -166,39 +206,36 @@ function spielStandSenden(spielStand){
  */
 function spielNachrichtSenden(texting){
 
-    stompClient.send("/app/spielnachricht", {}, JSON.stringify(texting));
+    //$('#spielInfo').text("Spiel Nachricht: " +  texting.infotext);
+    stompClient.send("/app/spielnachricht/" + sessionID, {}, JSON.stringify(texting));
 
 }
-
-
-/*
- * ein abruf des laufendes Spiel, in neuen Browser wird den Aktuellen spielStand angezeigt
- * Da hier kein Body verlangt wird, wir keine ausgabe deklariert(stompClient.subscribe("/spielstand/abfrage.....)
- *
- *  ACHTUNG: der SpielStand des aktuelles Spiel wir automatisch bei neuem socket verbindung geprüft.
- *  Zeile: 167, function connected()...
- */
-function spielStandAbfrage(){
-
-    stompClient.send("/app/spielstand/abfrage", {});
-}
-
 
 
 /*
  *   Neues Spiel Beginnen
- *  Start: spielfeld.js Zeile: 195
+ *  Start: spielfeld.js Zeile: 180
  */
-function neuesSpielSenden(){
+function neuesSpielStarten(){
 
     stompClient.send("/app/neuspielstarten", {}, "");
 
 }
 
+/*
+ *  wird benutzt hier Zeile: 14, 154
+ */
+function textareaLeeren(){
+     // Text Input Leeren + Focus setzen
+     $('#nachrichtText').val("");
+     $('#nachrichtText').focus();
+     $('#nachrichtText').css( "height", "36" );
+}
 
 
 /*
- * connect anzeige, start(hier) Zeile: 34
+ *  connect anzeige, start(hier) Zeile: 34
+ *  Automatische Client session abfrage
  */
 function connected(){
 

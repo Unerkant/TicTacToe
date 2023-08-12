@@ -9,6 +9,7 @@ package com.tictactoc.TicTacToe.model;
 public class Nachricht {
 
     private String text;
+    private String usersession;
 
     public String getText() {
         return text;
@@ -17,4 +18,6 @@ public class Nachricht {
         this.text = text;
     }
 
+    public String getUsersession() { return usersession; }
+    public void setUsersession(String usersession) { this.usersession = usersession; }
 }

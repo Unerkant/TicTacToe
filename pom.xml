@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tictactoe</groupId>
 	<artifactId>TicTacToe</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<name>TicTacToe</name>
 	<description>TicTacToe project for Spring Boot</description>
 	<properties>
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-			<version>3.1.0</version>
+			<version>3.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

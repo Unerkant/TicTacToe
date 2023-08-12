@@ -27,6 +27,7 @@
             <td align="center">
 
                 <h2>Nachricht</h2>
+                <div><span>Meine Session: </span><small id="userSession" class="blau"></small></div>
 
             </td>
             <td width="50" height="50" align="left" valign="center">
@@ -43,20 +44,22 @@
 
     <br><br>
     <form class="nachrichtForm" onSubmit="return false" >
-        <input id="nachrichtText" class="nachrichtButton" type="text" />
+        <textarea id="nachrichtText" class="nachrichtTextarea" placeholder="Schreibe eine Nachricht..."></textarea>
         <br>
+        <!-- mysocket.js, Zeile: 134 -->
         <button class="nachrichtButton" onclick="nachrichtSenden(nachrichtText.value)">Nachricht Senden</button>
     </form>
 
     <br>
     <hr>
-    <div>
+<!--    <div>
         Deine UUID: <em id="uuid" data-th-text="${uuid}"></em>
-    </div>
+    </div>-->
 </div>
 
 
 <script type="text/javascript" th:src="@{/js/mysocket.js}"></script>
+<script type="text/javascript" th:src="@{/js/mytextarea.js}"></script>
 
 </body>
 </html>

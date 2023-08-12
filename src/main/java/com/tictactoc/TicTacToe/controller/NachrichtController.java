@@ -3,6 +3,7 @@ package com.tictactoc.TicTacToe.controller;
 import com.tictactoc.TicTacToe.model.Nachricht;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,13 +25,14 @@ public class NachrichtController {
     @GetMapping(value = "/nachricht")
     public String nachricht(Model model){
         UUID uuid = UUID.randomUUID();
-        model.addAttribute("uuid", uuid.toString());
+        //model.addAttribute("uuid", uuid.toString());
         return "/nachricht";
     }
 
 
     @MessageMapping(value = "/nachrichten")
     public void nachrichtenReceiving(Nachricht nachricht) throws Exception{
+
         simpMessagingTemplate.convertAndSend("/nachrichten/empfangen/alle", nachricht);
     }
 }

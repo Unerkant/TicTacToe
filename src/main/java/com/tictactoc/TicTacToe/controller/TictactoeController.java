@@ -1,10 +1,12 @@
 package com.tictactoc.TicTacToe.controller;
 
-import com.tictactoc.TicTacToe.configuration.WebSocketEventListener;
+import com.tictactoc.TicTacToe.model.Spielnachricht;
 import com.tictactoc.TicTacToe.model.Spielstand;
 import com.tictactoc.TicTacToe.service.ClienSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +46,7 @@ public class TictactoeController {
     }
 
 
+
     /**
      * Laden von Haupt Seite
      * @return
@@ -57,40 +60,59 @@ public class TictactoeController {
     }
 
 
-
     /**
-     * Spiel Stand in einen Array speichern...
-     * Kurze Beschreibung:
-     * wenn in SpielFeld wird der mittleren feld(id:5) angeklickt + gewellt als spielStein eine 'kreuz',
-     * wird automatisch einen array 'newObj = {"feldId" : id, "spielStein" : "kreuz"};' von spielfeld.js Zeile: 129
-     * an socket gesendet... bevor der array an socket ankommt wird er hier bearbeitet, von mysocket.js Zeile: 125
-     * 'stompClient.send("/app/spielstand", {}, JSON.stringify(spielStand));'...
-     * hier unten in messageMapping wird die position der ckilck in variable spielstaende gespeichert...
-     * die variable 'spielstaende' hatte feste 9 size, die zugesendete array hatte die ID: 5 + speilStein als 'kreuz',
-     * das bedeutet: in variable 'spielstaende' unter die Position 5 wird den string 'kreuz' gespeichert...
-     * [null,null,null,null,"kreuz",null,null,null,null]... dieser array wird weiter an socket gegeben
-     * mysocket.js Zeile: 35... stompClient.subscribe("/spielstand/empfangen/alle", function(spielzug)
-     * von socket wird der array weiter an alle gesendet und angezeigt...spielfeld.js Zeiel: 164
-     * function spielFeldSetzen(feldData){... hier wierd der array durch die schleife bearbetet und an richtige stelle
-     * den feld mit dem stein belegen(unser fall, auf 5 position einen kreuz setzen)...
+     * nur für Nachrichten schreiben, keine spiel Nachricht anzeigen
+     * QUELLE: HOME -> 'eine Nachricht an alle schreiben'
      *
-     *
-     * @param spielstand
+     * @param sessionsId
+     * @param spielnachricht
      */
-    @MessageMapping(value = "/spielstand")
-    public void spielstandReceiving(Spielstand spielstand){
+    @MessageMapping(value = "/spielnachricht/{sessionId}")
+    public void spielNachrichtReceiving(@DestinationVariable("sessionId") String sessionsId, Spielnachricht spielnachricht){
 
-        if (darfSteinSetzen(spielstand)) {
-            spielstaende[spielstand.getFeldId() - 1] = spielstand.getSpielStein();
-        }
-
-        simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
-        //System.out.println("Controller: " + spielstand.getFeldId() +" / "+ spielstand.getSpielStein() +" / "+ spielstaende);
+        simpMessagingTemplate.convertAndSend("/spielnachricht/empfangen/" + sessionsId, spielnachricht);
     }
 
 
     /**
+     * benutzt von spielstandReceiving Zeile: 67(hier oben)
+     */
+ /*   @MessageMapping(value = "/spielstand/abfrage")
+    public void  spielStandAbfrageReceiving(){
+
+        simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
+
+    }*/
+
+
+
+    /**
+     * Spiel Stand in einen Array speichern...
+     *
+     * @param spielstand
+     */
+    @MessageMapping(value = "/spielstand")
+    public void spielstandReceiving(Spielstand spielstand, SimpMessageHeaderAccessor accessor){
+
+        String sessionId = accessor.getSessionId();
+        if (!darfSteinSetzen(spielstand)){
+            Spielnachricht spielnachricht = new Spielnachricht();
+            spielnachricht.setInfook("false");
+            spielnachricht.setInfotext("Spielfeld " + spielstand.getFeldId() + " ist bereits belegt");
+
+            //System.out.println("darf stein setzen: " + sessionId);
+            simpMessagingTemplate.convertAndSend("/spielnachricht/empfangen/" + sessionId, spielnachricht);
+            return;
+        }
+
+        spielstaende[spielstand.getFeldId() - 1] = spielstand.getSpielStein();
+        simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
+
+    }
+
+    /**
      *  Prüfen, ob spiel Feld besetzt ist
+     *  benutzt von der Methode oben, spielstand
      *
      * @param spielstand
      * @return
@@ -107,6 +129,8 @@ public class TictactoeController {
 
 
     /**
+     *  ACHTUNG: AUSGESETZT, DIE SESSION WIRD DIREKT FÜR AKTUELLEN CLIENT IN HEADER ANGEZEIGT(masocket.js Zeile: 24)
+     *
      *  Client Session Anzeigen/entfernen
      *
      *  Kurze Beschreibung: Start in mysocket.js Zeile: 166
@@ -130,24 +154,16 @@ public class TictactoeController {
     @MessageMapping(value = "/clientSession")
     public void clientSessionAbfrageReceiving(){
 
-        clienSessionService.sessionSenden();
-        //System.out.println("TicTacTocController" );
-    }
-
-
-    /**
-     * benutzt von spielstandReceiving Zeile: 67(hier oben)
-     */
-    @MessageMapping(value = "/spielstand/abfrage")
-    public void  spielStandAbfrageReceiving(){
-
-        simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
+        clienSessionService.sessionSenden(); //ACNTUNG AUSGESETZT
 
     }
+
 
 
     /**
      * Neues Spiel Starten
+     * Nachricht anzeige an allen, text definiert in socket(stopmClient)
+     *
      * @return
      */
     @MessageMapping(value = "/neuspielstarten")

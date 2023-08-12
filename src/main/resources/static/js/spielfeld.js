@@ -99,27 +99,13 @@
     $( ".spielfeld" ).on( "click", function() {
 
         var id = this.id;
-        if (istEinsDerBilderSichtbar(id) || kreuzOderKreis == false) {
-            if(kreuzOderKreis == false){
-
-                // nur Nachricht anzeigen, noch kein Spiel Stein gewellt
-                infoText = "treffen sie ihre Wahl, kreuz oder kreis"
-                infoOk = false;
-                var ihreWahl = {"infook" : infoOk, "infotext" : infoText};
-                spielNachrichtSenden(ihreWahl);
-
-            } else {
-
-                // einen click auf der Besetzten Feld, nachricht an allen anzeigen
-                infoText = "bereits getätigt"
-                infoOk = false;
-                var feldBesetzt = {"infook" : infoOk, "infotext" : infoText};
-                spielNachrichtSenden(feldBesetzt);
-
-            }
-
-            // mache nichts, wenn spielfeld schon gesetzt ist
-            return;
+        if(kreuzOderKreis == false){
+            // nur Nachricht anzeigen, noch kein Spiel Stein gewellt
+            infoText = "treffen sie ihre Wahl, kreuz oder kreis"
+            infoOk = false;
+            var ihreWahl = {"infook" : infoOk, "infotext" : infoText};
+            spielNachrichtSenden(ihreWahl);
+            return
         }
 
         // nach dem wellen des Steines, spiel aktivieren(wahl & hover wird ausgesetzt, Zeile: 26)
@@ -141,12 +127,13 @@
 
     });
     /*
+     *  ZURZEIT AUSGESETZT...
      *  Benutzt nur von oberer  function '.spielfeld',
      *  prüfen ob angeklickte feld schon besetzt ist...
      */
-    function istEinsDerBilderSichtbar(id) {
+ /*   function istEinsDerBilderSichtbar(id) {
        return $("#"+id+"K").is(":visible") || $("#"+id+"R").is(":visible");
-    }
+    }*/
 
 
 
@@ -188,17 +175,12 @@
      *  Neues Spiel Starten,
      *
      *  Start: spielfragments.html Zeile: 88(a, onClick)
-     *  Weitersenden: mysocket.js Zeile: 157
+     *  Weitersenden: mysocket.js Zeile: 207
      */
     function neuesSpiel(){
 
-        neuesSpielSenden();
+        neuesSpielStarten();
 
-        // Nachricht an alle Senden
-        infoOk = true;
-        infoText = "Ein neues Spiel beginnt!"
-        var spielneustarten = {"infook" : infoOk, "infotext" : infoText};
-        spielNachrichtSenden(spielneustarten);
     }
 
 
@@ -228,15 +210,6 @@
 
     }
 
-
-    /*
-     *  zugesendet von masocket.js Zeile: 78
-     */
-    function clientSessionAnzeigen(session){
-
-        //alert("Session" + session.clientId);
-        $("#clientsIdsAnzeige").text( session.clientsSessions );
-    }
 
     /*
      *  Informationen Anzeigen,

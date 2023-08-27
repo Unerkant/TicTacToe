@@ -16,6 +16,8 @@
     var infoOk = true;
 
 
+    /* ********************** Hover effect *************************** */
+
     /*
      *  nur den kreuz oder kreis wellen + hover effekt,
      *  wenn ersten SpielStein gesetzt ist dann wahl + hover effekt aussetzen
@@ -82,6 +84,7 @@
     /*
      * nur Information Anzeige, von Zeile: 68 + 78
      * Spielstein wellen und Nachricht anzeigen, start(hier) Zeile: 38 & 46
+     * gesendet an mysocket.js Zeile: 208
      */
     function spielSteinWellen(gewelltestein){
 
@@ -91,6 +94,8 @@
         spielNachrichtSenden(steinGewellt);
     }
 
+
+    /* ******************* Spiel Feld Click + Stein ins Feld setzen ******************** */
 
     /*
      *  kreuz oder kreis in den Spiel Feld setzen, mysocket.js Zeile: 53
@@ -169,7 +174,7 @@
 
     }
 
-
+    /* *********************** Neues Spiel + Spiel Reset ************************* */
 
     /*
      *  Neues Spiel Starten,
@@ -211,15 +216,19 @@
     }
 
 
+    /* ************************* Alle Nachrichten anzeigen *********************** */
+
     /*
      *  Informationen Anzeigen,
      *  Zeile: (hier) 77, 81, 114, 150
      *  spielfragments.html     Zeile: 37
+     *
+     *  Fehler Nachrichten werden nach 3 Sekunden ausgeblendet
      */
     function infoAnzeige(ok, text){
 
         ok == "true" ? $("#spielInfo").css("color","black") : $("#spielInfo").css("color","red");
         $("#spielInfo").html("<p>"+text+"<p>");
-        $("#spielInfo p").delay(2000).fadeOut(600);
+        $("#spielInfo p").delay(3000).fadeOut(600);
         //setTimeout(function() {sleep(loschen)}, 2000);
     }

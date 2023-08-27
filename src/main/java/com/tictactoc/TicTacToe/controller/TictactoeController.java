@@ -30,6 +30,7 @@ public class TictactoeController {
 
     private final List<String> sessionArray = new ArrayList<String>();
     private String[] spielstaende;
+    private boolean kreuzIstDran = true;
 
 
     public TictactoeController(){
@@ -77,12 +78,12 @@ public class TictactoeController {
     /**
      * benutzt von spielstandReceiving Zeile: 67(hier oben)
      */
- /*   @MessageMapping(value = "/spielstand/abfrage")
+    @MessageMapping(value = "/spielstand/abfrage")
     public void  spielStandAbfrageReceiving(){
 
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
 
-    }*/
+    }
 
 
 
@@ -95,17 +96,24 @@ public class TictactoeController {
     public void spielstandReceiving(Spielstand spielstand, SimpMessageHeaderAccessor accessor){
 
         String sessionId = accessor.getSessionId();
-        if (!darfSteinSetzen(spielstand)){
-            Spielnachricht spielnachricht = new Spielnachricht();
-            spielnachricht.setInfook("false");
-            spielnachricht.setInfotext("Spielfeld " + spielstand.getFeldId() + " ist bereits belegt");
 
-            //System.out.println("darf stein setzen: " + sessionId);
-            simpMessagingTemplate.convertAndSend("/spielnachricht/empfangen/" + sessionId, spielnachricht);
+        if (!istPlatzAufDemSpielfeldFürDiesenStein(spielstand)){
+
+            schickeNachrichtAnEinenEmpfaenger(sessionId, "false", "Spielfeld " + spielstand.getFeldId() + " ist bereits belegt");
             return;
         }
 
+        if (spielstand.getSpielStein().equals("kreis") && kreuzIstDran ||
+            spielstand.getSpielStein().equals("kreuz") && !kreuzIstDran){
+
+            String letzteStein = spielstand.getSpielStein().equals("kreuz") ? "&#10005;" : "&#9711;";
+            schickeNachrichtAnEinenEmpfaenger(sessionId, "false", letzteStein + " ist nicht dran!");
+            return;
+
+        }
+
         spielstaende[spielstand.getFeldId() - 1] = spielstand.getSpielStein();
+        kreuzIstDran = !kreuzIstDran;
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
 
     }
@@ -117,7 +125,7 @@ public class TictactoeController {
      * @param spielstand
      * @return
      */
-    public boolean darfSteinSetzen(Spielstand spielstand){
+    public boolean istPlatzAufDemSpielfeldFürDiesenStein(Spielstand spielstand){
 
         if(spielstaende[spielstand.getFeldId() - 1] == null){
 
@@ -126,6 +134,24 @@ public class TictactoeController {
 
             return false;
     }
+
+
+    /**
+     * Nachricht an einen bestimmten User senden
+     *
+     * @param sessionIds
+     * @param infoOk
+     * @param infoText
+     */
+    private void schickeNachrichtAnEinenEmpfaenger(String sessionIds, String infoOk, String infoText){
+        Spielnachricht spielnachricht = new Spielnachricht();
+        spielnachricht.setInfook(infoOk);
+        spielnachricht.setInfotext(infoText);
+
+        simpMessagingTemplate.convertAndSend("/spielnachricht/empfangen/" + sessionIds, spielnachricht);
+    }
+
+
 
 
     /**

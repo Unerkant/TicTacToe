@@ -2,18 +2,20 @@
 
 
 /*
- *  Socket
+ *  Socket, startet automatisch hier unten Zeile: 126
  */
+
+    /* ************************* Socket + connect + disconnect ************************ */
+
 var spielZugArray = [];
 var stompClient = null;
 var sessionID   = null;
 function connect(){
 
-    //$('#nachrichtText').focus();
     // Textarea Leeren Zeile: 225 (hier unten)
     textareaLeeren();
 
-    //alert("connect");
+    //Socket + stompClient
     var socket = new SockJS('/registrieren');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function(frame){
@@ -122,13 +124,41 @@ function connect(){
  */
 $(function(){
     connect();
+    //kreuzGewellt();
 });
+
+
+/*
+ *  connect anzeige, start(hier) Zeile: 34
+ *  Automatische Client session abfrage
+ */
+function connected(){
+
+    $('#online').removeClass("offlineBild");
+    $('#online').addClass("onlineBild");                //tictactoe.html
+    $('#onlineNachricht').removeClass("offlineBild");
+    $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
+
+    //clientSessionAbfragen(); // client session holen/anzeigen Zeile:137 (hier oben)
+    spielStandAbfrage();
+}
+
+
+/*
+ *  Allgemeine Fehler Anzeige
+ *  ID: #meineUUID + #online, sind in tictactoe.html Zeile: 31 + 35
+ */
+function disconnected(fehler){
+
+    $('#online').removeClass("onlineBild");
+    $('#online').addClass("onlineFehler");
+    $('#meineUUID').html("<span class='rot'>" + fehler + "</span>");
+}
+
 
 
 
     /* ***************************** Sende Methoden ********************************** */
-
-
 
 /*
  * Nachrichten Senden, onClick in nachricht.html Zeile: 50
@@ -222,6 +252,8 @@ function neuesSpielStarten(){
 
 }
 
+    /* ************************* Textarea ************************************************** */
+
 /*
  *  wird benutzt hier Zeile: 14, 154
  */
@@ -232,30 +264,3 @@ function textareaLeeren(){
      $('#nachrichtText').css( "height", "36" );
 }
 
-
-/*
- *  connect anzeige, start(hier) Zeile: 34
- *  Automatische Client session abfrage
- */
-function connected(){
-
-    $('#online').removeClass("offlineBild");
-    $('#online').addClass("onlineBild");                //tictactoe.html
-    $('#onlineNachricht').removeClass("offlineBild");
-    $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
-
-    clientSessionAbfragen(); // client session holen/anzeigen Zeile:137 (hier oben)
-    spielStandAbfrage();
-}
-
-
-/*
- *  Allgemeine Fehler Anzeige
- *  ID: #meineUUID + #online, sind in tictactoe.html Zeile: 31 + 35
- */
-function disconnected(fehler){
-
-    $('#online').removeClass("onlineBild");
-    $('#online').addClass("onlineFehler");
-    $('#meineUUID').html("<span class='rot'>" + fehler + "</span>");
-}

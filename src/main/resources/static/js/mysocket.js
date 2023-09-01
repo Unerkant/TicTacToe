@@ -24,6 +24,7 @@ function connect(){
         var registerPfad = this.ws._transport.url;
         var pfadElemente = registerPfad.split("/");
         sessionID    = pfadElemente[pfadElemente.length - 2];
+
         // tictactoe.html: client session ID in header anzeigen...
         $("#clientsIdsAnzeige").text( sessionID );
         // nachricht.html: client session ID in Header anzeigen
@@ -51,6 +52,7 @@ function connect(){
         stompClient.subscribe("/clientsession/empfangen/alle", (sessionenId) => {
             var clientSessionId = JSON.parse(sessionenId.body);
 
+            clientSessionAnzeigen(clientSessionId.clientsSessions);
             // AUSGESETZT: wird Direkt nur für Aktuelle Client in Header angezeigt, Zeile:24 (hier oben)
 
         });
@@ -65,32 +67,44 @@ function connect(){
 
                 var spielZug = JSON.parse(spielzug.body);
 
+                /*
+                 * Spiel kreuz oder kreis ins spielFeld setzen,s
+                 * weiter senden an spielfeld.js Zeile: 155
+                 * weitergeleiteten array sieht so aus: feste 9 size
+                 *  [null,null,null,"kreuz","kreis","kreuz",null,null,"kreis"]
+                 */
+                spielFeldSetzen(spielZug);
+
             } catch(e) {
 
                 $('#spielInfo').html("JSON.parse Fehler:  <span class='rot'>" + e.message + "</span>");
             }
 
-            /*
-             * Spiel kreuz oder kreis ins spielFeld setzen,s
-             * weiter senden an spielfeld.js Zeile: 163
-             * weitergeleiteten array sieht so aus: feste 9 size
-             *  [null,null,null,"kreuz","kreis","kreuz",null,null,"kreis"]
-             */
 
-            spielFeldSetzen(spielZug);
+
+
 
         });
 
 
         /*
-        *   empfangen von Nachricht von Spielverlauf oder spielfehler
-        *   1. SpielFeld ist besetzt: spielfeld.js Zeile: 113
-        */
+         *   empfangen von Nachricht von Spielverlauf oder spielfehler
+         *   1. SpielFeld ist besetzt: spielfeld.js Zeile: 113
+         */
         stompClient.subscribe("/spielnachricht/empfangen/" + sessionID, (spielnachricht) => {
-            var spielNachricht = JSON.parse(spielnachricht.body);
 
-            //$('#spielInfo').text("Spiel Nachricht: " + spielNachricht.infotext);
-            infoAnzeige(spielNachricht.infook, spielNachricht.infotext);
+            try{
+
+                var spielNachricht = JSON.parse(spielnachricht.body);
+
+                //$('#spielInfo').text("Spiel Nachricht: " + spielNachricht.infotext);
+                infoAnzeige(spielNachricht.infook, spielNachricht.infotext);
+            } catch(e) {
+
+                $('#spielInfo').html("JSON.parse Fehler:  <span class='rot'>" + e.message + "</span>");
+
+            }
+
         });
 
 
@@ -130,7 +144,7 @@ $(function(){
 
 /*
  *  connect anzeige, start(hier) Zeile: 34
- *  Automatische Client session abfrage
+ *  Automatische Client session abfrage Zeile: 196 (hier unten)
  */
 function connected(){
 
@@ -139,7 +153,7 @@ function connected(){
     $('#onlineNachricht').removeClass("offlineBild");
     $('#onlineNachricht').addClass("onlineBild");       //nachricht.html
 
-    //clientSessionAbfragen(); // client session holen/anzeigen Zeile:137 (hier oben)
+    clientSessionAbfragen(); // client session holen/anzeigen Zeile:196 (hier unten)
     spielStandAbfrage();
 }
 
@@ -188,9 +202,9 @@ function nachrichtSenden(value){
 
 /*
  *  Client session Id abfragen, anzeigen und bei schliessen entfernen
- *  Automatische Start bei socket connected, Zeile: 208(hier unten)
+ *  Automatische Start bei socket connected, Zeile: 156(hier oben)
  *
- *  Weitergeleitet an TictactoeController Zeile: 154,
+ *  Weitergeleitet an TictactoeController Zeile: 204,
  *  @MessageMapping(value = "/clientSession")
  */
 function clientSessionAbfragen(){

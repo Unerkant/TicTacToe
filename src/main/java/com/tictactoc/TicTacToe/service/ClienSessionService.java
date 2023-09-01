@@ -69,10 +69,32 @@ public class ClienSessionService {
         Clientsession clientsession = new Clientsession();
         clientsession.setClientsSessions(aktiveSession.toString());
 
+        // Sessionen senden an mysocket.js Zeile: 51
         simpMessagingTemplate.convertAndSend("/clientsession/empfangen/alle", clientsession);
         //System.out.println("Service session Senden: " + clientsession.getClientsSessions());
     }
 
 
+    /* ********************** füt TicTacTocController ********************** */
+
+    public boolean istErsteOderZweiteSessionId(String sessionId) {
+        String ersteSession = getAktiveSessionAnPosition(0);
+        String zweiteSession = getAktiveSessionAnPosition(1);
+
+        if (ersteSession != null && ersteSession.equals(sessionId) ||
+                zweiteSession != null && zweiteSession.equals(sessionId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private String getAktiveSessionAnPosition(int position) {
+        if (aktiveSession.size() < position+1) {
+            return null;
+        }
+
+        return aktiveSession.get(position);
+    }
 
 }

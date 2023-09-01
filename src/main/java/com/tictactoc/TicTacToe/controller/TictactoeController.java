@@ -28,7 +28,7 @@ public class TictactoeController {
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
-    private final List<String> sessionArray = new ArrayList<String>();
+    private List<String> sessionArray = new ArrayList<String>();
     private String[] spielstaende;
     private boolean kreuzIstDran = true;
 
@@ -75,11 +75,12 @@ public class TictactoeController {
     }
 
 
+
     /**
      * benutzt von spielstandReceiving Zeile: 67(hier oben)
      */
     @MessageMapping(value = "/spielstand/abfrage")
-    public void  spielStandAbfrageReceiving(){
+    public void  spielStandAbfrageReceiving(SimpMessageHeaderAccessor accessor){
 
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
 
@@ -97,12 +98,21 @@ public class TictactoeController {
 
         String sessionId = accessor.getSessionId();
 
-        if (!istPlatzAufDemSpielfeldFürDiesenStein(spielstand)){
+        // Spiel nut für Zwei zulassen
+        if (!clienSessionService.istErsteOderZweiteSessionId(sessionId)) {
+
+            schickeNachrichtAnEinenEmpfaenger(sessionId, "false", "Du darfst nicht spielen!");
+            return;
+        }
+
+        // besetzte Spiel Feld
+        if (!istPlatzAufDemSpielfeldFuerDiesenStein(spielstand)){
 
             schickeNachrichtAnEinenEmpfaenger(sessionId, "false", "Spielfeld " + spielstand.getFeldId() + " ist bereits belegt");
             return;
         }
 
+        // Reihe Folge achten
         if (spielstand.getSpielStein().equals("kreis") && kreuzIstDran ||
             spielstand.getSpielStein().equals("kreuz") && !kreuzIstDran){
 
@@ -112,6 +122,7 @@ public class TictactoeController {
 
         }
 
+        // wenn alles nach dem reihe, folgt
         spielstaende[spielstand.getFeldId() - 1] = spielstand.getSpielStein();
         kreuzIstDran = !kreuzIstDran;
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
@@ -125,7 +136,7 @@ public class TictactoeController {
      * @param spielstand
      * @return
      */
-    public boolean istPlatzAufDemSpielfeldFürDiesenStein(Spielstand spielstand){
+    public boolean istPlatzAufDemSpielfeldFuerDiesenStein(Spielstand spielstand){
 
         if(spielstaende[spielstand.getFeldId() - 1] == null){
 
@@ -159,28 +170,28 @@ public class TictactoeController {
      *
      *  Client Session Anzeigen/entfernen
      *
-     *  Kurze Beschreibung: Start in mysocket.js Zeile: 166
-     *  function clientSessionAbfragen()...
+     *  Kurze Beschreibung: Start in mysocket.js Zeile: 156
+     *  function clientSessionAbfragen()... in function connected()
      *
      *  Kurze Beschreibung: eine neue sessionId bei hollen, bei Neuverbindung eines Clients,
      *  1. Start mysocket.js Zeile: 137, 208, ... stompClient.send("/app/clientSession", {});
      *  2. von hier werden in ClientSessionService die alle aktive sessionId zusammen gesetzt oder
-     *      nicht aktive entfernt, und schliesslich von da an der socket (masocket.js Zeile: 73) gesendet
+     *      nicht aktive entfernt, und schliesslich von da an der socket (masocket.js Zeile: 51) gesendet
      *  3. zusetliche scripte:
      *      a. WebSocketEventListener:
      *          Um auf eine neue Anmeldung per Socket zu reagieren, gibt es in
      *          Sprint die Möglichkeit einen “EventListener“ zu definiert:
      *      b. ClientSessionService:
      *          hold den von socketListener generierte session Id und setzt alle zusammen,
-     *          schliesslich sendet den list-array an socket wieter (mysocket.js Zeile: 73)
-     *  4. mysocket.js: Zeile 73, da werden zugesendete daten verarbeitet und an alle angezegt
+     *          schliesslich sendet den list-array an socket wieter (mysocket.js Zeile: 51)
+     *  4. mysocket.js: Zeile 51, da werden zugesendete daten verarbeitet und an alle angezegt
      *      in spielfeld.js Zeile: 235, ... function clientSessionAnzeigen(session)..
      *
      */
     @MessageMapping(value = "/clientSession")
     public void clientSessionAbfrageReceiving(){
 
-        clienSessionService.sessionSenden(); //ACNTUNG AUSGESETZT
+        clienSessionService.sessionSenden(); //ClientSessionService Zeile: 63
 
     }
 

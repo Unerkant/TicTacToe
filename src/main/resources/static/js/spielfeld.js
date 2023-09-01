@@ -95,7 +95,7 @@
     }
 
 
-    /* ******************* Spiel Feld Click + Stein ins Feld setzen ******************** */
+    /* ******************* Click auf dem Feld + Stein ins Feld setzen ******************** */
 
     /*
      *  kreuz oder kreis in den Spiel Feld setzen, mysocket.js Zeile: 53
@@ -216,6 +216,23 @@
     }
 
 
+    /* ************************** Session Anzeigen ******************************* */
+
+    /*
+     *  ACHTUNG: Zur zeit Ausgeblendet in 2 stellen
+     *  1. mysocket.js Zeile: 156, function connected()...
+     *  2. und hier unten die anzeige...
+     *
+     *  Rest alles intakt:
+     *  mysocket.js Zeile: 197  +
+     *  TicTacToeController Zeile: 186,  @MessageMapping(value = "/clientSession")  +
+     *  mysocket.js Zeile: 51, stompClient.subscribe("/clientsession/empfangen/alle"...
+     */
+    function clientSessionAnzeigen(session){
+
+        //$("#clientsIdsAnzeige").text(session);
+    }
+
     /* ************************* Alle Nachrichten anzeigen *********************** */
 
     /*
@@ -223,12 +240,14 @@
      *  Zeile: (hier) 77, 81, 114, 150
      *  spielfragments.html     Zeile: 37
      *
-     *  Fehler Nachrichten werden nach 3 Sekunden ausgeblendet
+     *  Fehler Nachrichten werden nach 3 Sekunden auseblendet
      */
     function infoAnzeige(ok, text){
 
         ok == "true" ? $("#spielInfo").css("color","black") : $("#spielInfo").css("color","red");
         $("#spielInfo").html("<p>"+text+"<p>");
-        $("#spielInfo p").delay(3000).fadeOut(600);
+        if(ok == "false"){
+            $("#spielInfo p").delay(3000).fadeOut(600);
+        }
         //setTimeout(function() {sleep(loschen)}, 2000);
     }

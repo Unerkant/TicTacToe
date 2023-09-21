@@ -1,7 +1,10 @@
 package com.tictactoc.TicTacToe.controller;
 
+import com.tictactoc.TicTacToe.model.Gewinnbenachrichtigung;
+import com.tictactoc.TicTacToe.model.Gewinnercounter;
 import com.tictactoc.TicTacToe.model.Spielnachricht;
 import com.tictactoc.TicTacToe.model.Spielstand;
+import com.tictactoc.TicTacToe.repository.Siege;
 import com.tictactoc.TicTacToe.service.ClienSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -21,7 +24,7 @@ import java.util.UUID;
  */
 
 @Controller
-public class TictactoeController {
+public class TictactoeController implements Siege {
 
     @Autowired
     private ClienSessionService clienSessionService;
@@ -31,6 +34,9 @@ public class TictactoeController {
     private List<String> sessionArray = new ArrayList<String>();
     private String[] spielstaende;
     private boolean kreuzIstDran = true;
+    private int kreuzCount = 0;
+    private int kreisCount = 0;
+    private int unentschieden = 0;
 
 
     public TictactoeController(){
@@ -44,6 +50,10 @@ public class TictactoeController {
     public void neusSpielfeldErstellen(){
 
         spielstaende = new String[9];
+        kreuzIstDran = true;
+        // Zählt alle Zuge, nach jedem Spiel muss auf null gesetzt, Zeile: 175
+        unentschieden = 0;
+
     }
 
 
@@ -59,6 +69,7 @@ public class TictactoeController {
         model.addAttribute("uuid", uuid.toString());
         return "/tictactoe";
     }
+
 
 
     /**
@@ -82,6 +93,7 @@ public class TictactoeController {
     @MessageMapping(value = "/spielstand/abfrage")
     public void  spielStandAbfrageReceiving(SimpMessageHeaderAccessor accessor){
 
+        gewinnCounterAnzeigen();
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
 
     }
@@ -122,12 +134,50 @@ public class TictactoeController {
 
         }
 
-        // wenn alles nach dem reihe, folgt
+
+        /**
+         * wenn alles nach der Reihe läuft,
+         * dann nächsten zug(stein) wird in array gespeichert... [null,"kreuz",null,null,null,"kreis",null,null,null]
+         */
         spielstaende[spielstand.getFeldId() - 1] = spielstand.getSpielStein();
         kreuzIstDran = !kreuzIstDran;
         simpMessagingTemplate.convertAndSend("/spielstand/empfangen/alle", spielstaende);
 
+
+        /**
+         * ACHTUNG: Gewinner Ermitteln, nach dem Setzen des Steines
+         */
+        TictactoeController controller = new TictactoeController();
+        if (welcheSteinGewonnen("kreuz")){
+
+            kreuzCount++;
+            // count in interface Sige speichern
+            controller.getKreuzCount(kreuzCount);
+            // Gewinner Count ausgeben
+            gewinnCounterAnzeigen();
+
+            // Nachricht, wer gewonnen hatte
+            gewinnBenachrichtigung("true", "Kreuz hatte Gewonnen", "kreuz");
+
+        } else if (welcheSteinGewonnen("kreis")){
+
+            kreisCount++;
+            controller.getKreisCount(kreisCount);
+            gewinnCounterAnzeigen();
+
+            // Gewinner Nachricht anzeigen
+            gewinnBenachrichtigung("true", "Kreis hatte Gewonnen", "kreis");
+
+        } else{
+            unentschieden++;
+            // Ausgabe nach dem letzten Zug
+            if (unentschieden == 9) {
+                gewinnBenachrichtigung("true", "Unentschieden!", "keine");
+            }
+        }
+
     }
+
 
     /**
      *  Prüfen, ob spiel Feld besetzt ist
@@ -136,7 +186,7 @@ public class TictactoeController {
      * @param spielstand
      * @return
      */
-    public boolean istPlatzAufDemSpielfeldFuerDiesenStein(Spielstand spielstand){
+    private boolean istPlatzAufDemSpielfeldFuerDiesenStein(Spielstand spielstand){
 
         if(spielstaende[spielstand.getFeldId() - 1] == null){
 
@@ -144,6 +194,59 @@ public class TictactoeController {
         }
 
             return false;
+    }
+
+
+    /**
+     * senden an die Methode 'gewinnPosition()' varianten von gewinn-positionen,
+     * schließlich in die Methode werde in den array 'spielstaende', [null,null,null,null,null,null,null,null,null]
+     * nach belegten positionen geprüft....
+     * Weiter detaillierte beschreibung unten, in commentary vor Methode gewinnPosition()...
+     *
+     * @param spielstein
+     * @return
+     */
+    private boolean welcheSteinGewonnen(String spielstein){
+
+        return  gewinnPosition(spielstein, 0, 1, 2) ||
+                gewinnPosition(spielstein, 3, 4, 5) ||
+                gewinnPosition(spielstein, 6, 7, 8) ||
+                gewinnPosition(spielstein, 0, 3, 6) ||
+                gewinnPosition(spielstein, 1, 4, 7) ||
+                gewinnPosition(spielstein, 2, 5, 8) ||
+                gewinnPosition(spielstein, 0, 4, 8) ||
+                gewinnPosition(spielstein, 2, 4, 6);
+
+    }
+
+
+    /**
+     *  Prüfen, ob alle Drei Steine in Gewinn Position stehen...
+     *  z.b.s mittlere reihe mit kreuz gefühlt: wird zugesendet, spielstein = kreuz, position 3 + 4 + 5
+     * 'gewinnPosition(spielstein, 3, 4, 5)'... dann von Array 'spielstaende' werden die Positionen abgefragt
+     *  ["kreis",null,null,"kreuz","kreuz","kreuz",null,"kreis",null]...
+     *  und schliesslich in variable gespeichert(positionEins, positionZwei und positionDrei)..
+     *  Fazit: wenn alle drei positionen sind mit dem gleichen stein belegt, GEWONNEN
+     *  in unserer fall der kreuz hatte gewonnen...
+     *
+     * @param spielstein
+     * @param eins
+     * @param zwei
+     * @param drei
+     * @return
+     */
+    private boolean gewinnPosition(String spielstein, int eins, int zwei, int drei ){
+
+        String positionEins = spielstaende[eins];
+        String positionZwei = spielstaende[zwei];
+        String positionDrei = spielstaende[drei];
+
+        return  positionEins != null && positionEins.equals(spielstein)
+                &&
+                positionZwei != null && positionZwei.equals(spielstein)
+                &&
+                positionDrei != null && positionDrei.equals(spielstein);
+
     }
 
 
@@ -162,6 +265,57 @@ public class TictactoeController {
         simpMessagingTemplate.convertAndSend("/spielnachricht/empfangen/" + sessionIds, spielnachricht);
     }
 
+
+    /**
+     * Gewinn Nachricht an alle schicken
+     *
+     * @param ok
+     * @param text
+     */
+    private void gewinnBenachrichtigung(String ok, String text, String stein){
+
+        Gewinnbenachrichtigung gewinnnachricht = new Gewinnbenachrichtigung();
+        gewinnnachricht.setGewinnOk(ok);
+        gewinnnachricht.setGewinnText(text);
+        gewinnnachricht.setGewinnStein(stein);
+
+        simpMessagingTemplate.convertAndSend("/gewinnnachrichten/empfangen/alle", gewinnnachricht);
+    }
+
+
+    /**
+     * Gewinner Count Anzeige an alle anzeigen
+     */
+    private void gewinnCounterAnzeigen(){
+
+        int kreuzTotal = getKreuzCount(kreuzCount);
+        int kreisTotal = getKreisCount(kreisCount);
+        Gewinnercounter gewinnercounter = new Gewinnercounter();
+        gewinnercounter.setKreuzCountTotal(kreuzTotal);
+        gewinnercounter.setKreisCountTotal(kreisTotal);
+
+        simpMessagingTemplate.convertAndSend("/gewinnercounter/empfangen/alle", gewinnercounter);
+    }
+
+    /**
+     * Schnittstele für Siege, einen Zähler für die Siege kreuz + kreis
+     * @param count
+     */
+    @Override
+    public int getKreuzCount(int count) {
+        //System.out.println("Kreuz Count: " + count);
+        return count;
+    }
+
+    /**
+     *  Schnittstele für Siege, einen Zähler für die Siege kreuz + kreis
+     * @param count
+     */
+    @Override
+    public int getKreisCount(int count) {
+        //System.out.println("Kreis Count: " + count);
+        return count;
+    }
 
 
 
@@ -199,7 +353,11 @@ public class TictactoeController {
 
     /**
      * Neues Spiel Starten
-     * Nachricht anzeige an allen, text definiert in socket(stopmClient)
+     *
+     * die variable spielstaende auf null setzen, Zeile: 44 (hier oben)... neuesSpielfeldErstellen()...
+     *
+     * Nachricht anzeige an allen, text definiert in mysocket.js (stopmClient),
+     * stompClient.subscribe("/neuspielstarten/empfangen/alle", Zeile: 121
      *
      * @return
      */
@@ -210,6 +368,5 @@ public class TictactoeController {
         simpMessagingTemplate.convertAndSend("/neuspielstarten/empfangen/alle", spielstaende);
         //System.out.println("Neues Spiel Beginnen: " + spielstaende);
     }
-
 
 }

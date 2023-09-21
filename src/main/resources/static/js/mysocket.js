@@ -52,7 +52,7 @@ function connect(){
         stompClient.subscribe("/clientsession/empfangen/alle", (sessionenId) => {
             var clientSessionId = JSON.parse(sessionenId.body);
 
-            clientSessionAnzeigen(clientSessionId.clientsSessions);
+            //clientSessionAnzeigen(clientSessionId.clientsSessions);
             // AUSGESETZT: wird Direkt nur für Aktuelle Client in Header angezeigt, Zeile:24 (hier oben)
 
         });
@@ -74,15 +74,18 @@ function connect(){
                  *  [null,null,null,"kreuz","kreis","kreuz",null,null,"kreis"]
                  */
                 spielFeldSetzen(spielZug);
+                console.log("Spielstand: " + spielZug);
+
+                /*
+                 *  Gewinner Ermitteln
+                 */
+                //spielGewinnerErmitteln(spielZug);
+
 
             } catch(e) {
 
                 $('#spielInfo').html("JSON.parse Fehler:  <span class='rot'>" + e.message + "</span>");
             }
-
-
-
-
 
         });
 
@@ -107,6 +110,47 @@ function connect(){
 
         });
 
+        /**
+         *  Gewinner Nachrichten
+         */
+        stompClient.subscribe("/gewinnnachrichten/empfangen/alle", (gewinnnachricht) => {
+
+            try{
+                var gewinnNachricht = JSON.parse(gewinnnachricht.body);
+
+                // Nachricht, gewinner anzeigen: kreuz, kreis oder unentschieden
+                infoAnzeige(gewinnNachricht.gewinnOk, gewinnNachricht.gewinnText);
+
+                /*
+                 *  Gewinner anzeigen, slide function... spielFeld.js Zeile: 188
+                 *
+                 *  array: gewinnNachricht ( wird zugesendet an function: spielGewinnerAnzeigen()...)
+                 *  {"gewinnOk":"true","gewinnText":"Kreuz hatte Gewonnen","gewinnStein":"kreuz","kreuzGewonnen":1,"kreisGewonnen":0}
+                 */
+                spielGewinnerAnzeigen(gewinnNachricht);
+
+            } catch(e) {
+                $('#spielInfo').html("JSON.parse(gewinnnachrichten) Fehler: <span class='rot'>" + e.message + "</span>")
+            }
+
+        })
+
+
+        /**
+         *  Gewinner counter
+         */
+        stompClient.subscribe("/gewinnercounter/empfangen/alle", (gewinncount) => {
+            try{
+                var gewinnCounter = JSON.parse(gewinncount.body);
+
+                gewinnerCounterAnzeigen(gewinnCounter);
+                console.log("Couter: " + gewinnCounter.kreuzCountTotal +"/"+ gewinnCounter.kreisCountTotal);
+
+            } catch(e) {
+                 $('#spielInfo').html("JSON.parse(gewinnercounter) Fehler: <span class='rot'>" + e.message + "</span>")
+            }
+        });
+
 
         /*
          *   Spiel Reset, alle variablen auf start einstellung
@@ -114,8 +158,10 @@ function connect(){
         stompClient.subscribe("/neuspielstarten/empfangen/alle", (spielreseten) => {
             var spielReseten = JSON.parse(spielreseten.body);
 
-            spielFeldSetzen(spielReseten);
-            spielVariableReset();
+            spielFeldSetzen(spielReseten);  // Spiel Feld auf null setzen
+            spielVariableReset();           // variable in spielfeld.js auf standard setzen Zeile: 294
+
+            // Nachricht an Alle anzeigen
             var okInfo = true;
             var textInfo = "Ein neues Spiel beginnt!";
             infoAnzeige(okInfo, textInfo);
@@ -209,7 +255,7 @@ function nachrichtSenden(value){
  */
 function clientSessionAbfragen(){
 
-    stompClient.send("/app/clientSession", {}); // ACHTUNG AUSGESETZT
+    stompClient.send("/app/clientSession", {});
 }
 
 
@@ -227,13 +273,14 @@ function spielStandAbfrage(){
 
 
 /*
- * Spiel Stand Senden, start spielfeld.js Zeile: 112 + 119
+ * Spiel Stand Senden, start spielfeld.js Zeile: 129 + 134
+ * weiter an TicTacToeController Zeile: 97,  @MessageMapping(value = "/spielstand")...
  */
 function spielStandSenden(spielStand){
 
    /*
     *   SpielStand array weiter leiten,
-    *   zuerst werden die Daten in TictactoeController / @MessageMapping(value = "/spielstand")
+    *   zuerst werden die Daten in TicTacToeController / @MessageMapping(value = "/spielstand")
     *   in einem neuen Array gespeichert: spielstaende = new String[9];
     *   von controller weiter an stompClient: stompClient.subscribe("/spielstand/empfangen/alle"
     *   hier oben Zeile: 35
@@ -257,8 +304,9 @@ function spielNachrichtSenden(texting){
 
 
 /*
- *   Neues Spiel Beginnen
- *  Start: spielfeld.js Zeile: 180
+ *  Neues Spiel Beginnen
+ *  Start: spielfeld.js Zeile: 243
+ *  Weiter an: TicTacTocController  Zeile: 309, @MessageMapping(value = "/neuspielstarten")
  */
 function neuesSpielStarten(){
 

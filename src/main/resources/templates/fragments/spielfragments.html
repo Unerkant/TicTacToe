@@ -33,11 +33,14 @@
 
         </div><!-- Ende SpielWahl -->
 
+
         <div class="spielWahlText">
             <div id="spielInfo"></div>
         </div>
 
+
         <!-- class 'spielfeld' nicht Löschen, benötigt für die javascript, spielfeld.js -->
+    <div class="spielBox">
         <table border="1" width="450" height="450" cellspacing="0" cellpadding="0">
             <tr>
                 <td class="spielfeld" id="1" width="150" height="150" align="center">
@@ -82,6 +85,10 @@
                 </td>
             </tr>
         </table>
+
+        <!--  -->
+        <div id="GEWINNERBOX" class="spielGewinner"><span id="GEWINNERTEXT" class="spielGewinnerText"></span></div>
+    </div>
 
         <br>
         <a class="spielNeues" href="#" th:onClick="'javascript:neuesSpiel();'">Neues Spiel</a>

@@ -12,7 +12,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/nachrichten", "/spielstand", "/spielnachricht", "/clientsession", "/neuspielstarten");
+        config.enableSimpleBroker("/nachrichten", "/clientsession", "/spielstand",
+                "/gewinnercounter", "/spielnachricht", "/gewinnnachrichten", "/neuspielstarten");
         config.setApplicationDestinationPrefixes("/app");
     }
 

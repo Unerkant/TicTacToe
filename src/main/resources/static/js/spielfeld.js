@@ -11,6 +11,7 @@
     // Kreuz oder Kreis Click
     var kreuz = true;
 
+
     // Information Ausgabe
     var infoText = "";
     var infoOk = true;
@@ -66,8 +67,11 @@
           mouseAktiv = false;
           kreuzOderKreis = true;
 
+
           // kurze info,
           spielSteinWellen("Sie haben Kreuz gewellt");
+
+
     }
     function kreisGewellt(){
          $('#RUNDWAHL').addClass( "wahlHover" );
@@ -78,7 +82,9 @@
 
          // kurze info
          spielSteinWellen("Sie Haben Kreis gewellt");
+
     }
+
 
 
     /*
@@ -119,13 +125,13 @@
         if (kreuz) {
 
             newObj = {"feldId" : id, "spielStein" : "kreuz"};
-            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 121
+            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 255
             spielStandSenden(newObj);
 
         } else {
 
             newObj = {"feldId" : id, "spielStein" : "kreis"};
-            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 121
+            // von angeklickte Feld, Daten weiter senden... mysocket.js Zeile: 255
             spielStandSenden(newObj);
 
         }
@@ -170,9 +176,64 @@
             $("#" + (i+1) + steinNichtAktiv).hide();
 
         }
-        //console.log('Push: ' + feldData);
 
     }
+
+    /* *********************** Gewinner anzeigen ******************************** */
+
+
+   /**
+    *   Daten werden von mysocket.js zugesendet: 127
+    *   array: gewinner
+    *   {"gewinnOk":"true","gewinnText":"Kreuz hatte Gewonnen","gewinnStein":"kreuz"}
+    */
+    function spielGewinnerAnzeigen(gewinner){
+
+        if(gewinner.gewinnStein == 'kreuz'){
+            // kreuz gewonnen
+            gewinnerSlide("&#10005; hat Gewonnen");
+
+        }else if(gewinner.gewinnStein == 'kreis'){
+            // kreis gewonnen
+            gewinnerSlide("&#9711; hat Gewonnen")
+
+        } else {
+            // unentschieden
+            gewinnerSlide("Unentschieden!");
+        }
+
+    }
+
+   /*
+    *   nur Slide function + Text Ausgabe
+    */
+    function gewinnerSlide(gewinnerText){
+
+        $('#GEWINNERBOX').fadeIn(1000, function(){
+            $('#GEWINNERTEXT').fadeIn(600, function(){
+
+                $(this).html(gewinnerText);
+
+            });
+        });
+    }
+
+
+    /**
+     * nur Counter anzeige in Whal Fenster
+     */
+    function gewinnerCounterAnzeigen(counter){
+
+        if(counter.kreuzCountTotal > null){
+            $('#kreuzSpieler').text(counter.kreuzCountTotal);
+        }
+        if(counter.kreisCountTotal > null){
+            $('#kreisSpieler').text(counter.kreisCountTotal);
+        }
+
+    }
+
+
 
     /* *********************** Neues Spiel + Spiel Reset ************************* */
 
@@ -180,7 +241,7 @@
      *  Neues Spiel Starten,
      *
      *  Start: spielfragments.html Zeile: 88(a, onClick)
-     *  Weitersenden: mysocket.js Zeile: 207
+     *  Weitersenden: mysocket.js Zeile: 287
      */
     function neuesSpiel(){
 
@@ -197,6 +258,7 @@
     */
     function spielVariableReset(){
 
+        // hover effect aussetzen
         $('#RUNDWAHL').removeClass( "wahlHover" );
         $('#KREUZWAHL').removeClass( "wahlHover" );
 
@@ -209,10 +271,14 @@
         // Kreuz oder Kreis Click
         kreuz = true;
 
-        // Information Ausgabe
+        uniCode = null;
+
+        // Information Ausgabe nullen
         infoText = "";
         infoOk = true;
 
+        // Gewinner Anzeige ausblenden, Zeile: 188(hier oben)
+        $('#GEWINNERBOX').fadeOut(600);
     }
 
 
@@ -220,7 +286,7 @@
 
     /*
      *  ACHTUNG: Zur zeit Ausgeblendet in 2 stellen
-     *  1. mysocket.js Zeile: 156, function connected()...
+     *  1. mysocket.js Zeile: 55, stompClient.subscribe("/clientsession/empfangen/alle"...
      *  2. und hier unten die anzeige...
      *
      *  Rest alles intakt:

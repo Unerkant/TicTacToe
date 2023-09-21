@@ -53,7 +53,13 @@ img.blok			    { display: block; width: 100%; }
                         }
 .wahlHover              { border-bottom: 2px solid #1608D3; }
 .spielWahlText          { height: 30px; }
+div.spielBox            { position: relative; width: 454px; height: 456px; padding-top: 1px; }
+div.spielGewinner       { display: none; position: absolute; top: 0; left: 0; background: #ECF2FF;
+                          width: 454px; height: 456px; line-height: 450px; text-align: center;
+                          border: 1px solid #E6E6FF; border-radius: 4px;}
+span.spielGewinnerText  { display: none; border-bottom: 3px solid #CC2900; font-size: 1.6em; color: #CC2900; }
 .spielNeues             { font-size: 1.2rem; color: #1608D3; }
+
 
 
     /* nachricht
